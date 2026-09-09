@@ -1,0 +1,92 @@
+<div class="tb">
+  <div class="tete">
+    <div>
+      <span class="surtitre">Vue d'ensemble</span>
+      <h1>Tableau de bord</h1>
+    </div>
+    <div class="periodes">
+      @for (p of periodes; track p.libelle) {
+        <button [class.actif]="periodeActive() === p.libelle" (click)="choisir(p)">{{ p.libelle }}</button>
+      }
+    </div>
+  </div>
+
+  @if (donnees(); as d) {
+    <div class="cartes">
+      <div class="carte primaire">
+        <span class="lib">Chiffre d'affaires</span>
+        <span class="val">{{ d.resume.chiffre_affaires | fcfa }}</span>
+      </div>
+      <div class="carte">
+        <span class="lib">Ventes physiques</span>
+        <span class="val">{{ d.resume.total_ventes_physiques | fcfa }}</span>
+        <span class="sous">{{ d.resume.nombre_ventes_physiques }} vente(s)</span>
+      </div>
+      <div class="carte">
+        <span class="lib">Ventes en ligne</span>
+        <span class="val">{{ d.resume.total_ventes_en_ligne | fcfa }}</span>
+        <span class="sous">{{ d.resume.nombre_commandes_validees }} commande(s)</span>
+      </div>
+      <div class="carte">
+        <span class="lib">Commandes en attente</span>
+        <span class="val accent">{{ d.resume.commandes_en_attente }}</span>
+        <span class="sous">à traiter</span>
+      </div>
+      <div class="carte">
+        <span class="lib">Articles vendus</span>
+        <span class="val">{{ d.resume.nombre_articles_vendus }}</span>
+      </div>
+      <div class="carte">
+        <span class="lib">Remboursements</span>
+        <span class="val">{{ d.resume.remboursements | fcfa }}</span>
+        <span class="sous">{{ d.resume.commandes_annulees }} annulée(s)</span>
+      </div>
+    </div>
+
+    <div class="bas-grille">
+      <section class="bloc-tb">
+        <h2>Encaissements par moyen</h2>
+        @if (d.resume.paiements_par_moyen.length) {
+          <ul class="liste-paie">
+            @for (p of d.resume.paiements_par_moyen; track p.moyen) {
+              <li><span>{{ libelleMoyen(p.moyen) }}</span><span class="m">{{ p.montant | fcfa }}</span></li>
+            }
+          </ul>
+        } @else {
+          <p class="vide-tb">Aucun encaissement sur la période.</p>
+        }
+      </section>
+
+      <section class="bloc-tb">
+        <h2>Top produits</h2>
+        @if (d.topProduits.length) {
+          <ul class="barres">
+            @for (t of d.topProduits; track t.produit_id) {
+              <li>
+                <div class="etiq"><span>{{ t.produit_nom }}</span><span>{{ t.quantite_vendue }}</span></div>
+                <div class="barre"><div class="rempli" [style.width.%]="pourcentage(t.quantite_vendue, maxProduit())"></div></div>
+              </li>
+            }
+          </ul>
+        } @else {
+          <p class="vide-tb">Aucune vente sur la période.</p>
+        }
+      </section>
+
+      <section class="bloc-tb">
+        <h2>Top catégories</h2>
+        @if (d.topCategories.length) {
+          <ul class="liste-paie">
+            @for (t of d.topCategories; track t.categorie_id) {
+              <li><span>{{ t.categorie_nom }}</span><span class="m">{{ t.quantite_vendue }} vendus</span></li>
+            }
+          </ul>
+        } @else {
+          <p class="vide-tb">Aucune vente sur la période.</p>
+        }
+      </section>
+    </div>
+  } @else {
+    <p class="chargement-tb">Chargement des statistiques…</p>
+  }
+</div>

@@ -1,0 +1,74 @@
+<div class="tete-p">
+  <div>
+    <span class="surtitre">Catalogue</span>
+    <h1>Produits</h1>
+  </div>
+  <a routerLink="/gestion/produits/nouveau" class="btn accent">+ Nouveau produit</a>
+</div>
+
+<div class="barre-outils">
+  <input type="search" placeholder="Rechercher un produit…" (change)="chercher($any($event.target).value)">
+  <select (change)="filtrerCategorie($any($event.target).value)">
+    <option value="">Toutes les catégories</option>
+    @for (c of categories(); track c.id) { <option [value]="c.id">{{ c.nom }}</option> }
+  </select>
+</div>
+
+@if (erreur()) { <p class="erreur-b">{{ erreur() }}</p> }
+
+@if (page(); as pg) {
+  @if (pg.total === 0) {
+    <p class="vide">Aucun produit. <a routerLink="/gestion/produits/nouveau">Créez le premier</a>.</p>
+  } @else {
+    <div class="tableau">
+      <table>
+        <thead>
+          <tr><th></th><th>Produit</th><th>Prix</th><th>Stock</th><th>Statut</th><th></th></tr>
+        </thead>
+        <tbody>
+          @for (p of pg.elements; track p.id) {
+            <tr [class.inactif]="!p.actif">
+              <td class="col-img">
+                @if (p.photo_principale) { <img [src]="p.photo_principale" [alt]="p.nom"> }
+                @else { <span class="mini-init">{{ p.nom.charAt(0) }}</span> }
+              </td>
+              <td class="col-nom">
+                <span class="n">{{ p.nom }}</span>
+                <span class="ref">{{ p.reference }}</span>
+              </td>
+              <td>
+                @if (p.en_promotion && p.prix_promo) {
+                  <span class="promo">{{ p.prix_promo | fcfa }}</span>
+                } @else {
+                  {{ p.prix_effectif | fcfa }}
+                }
+              </td>
+              <td><span [class.rupture]="p.en_rupture">{{ p.quantite_totale }}</span></td>
+              <td>
+                @if (!p.actif) { <span class="badge gris">Désactivé</span> }
+                @else if (p.en_rupture) { <span class="badge rouge">Rupture</span> }
+                @else if (p.statut === 'bientot_disponible') { <span class="badge jaune">Bientôt</span> }
+                @else { <span class="badge vert">En vente</span> }
+              </td>
+              <td class="col-actions">
+                <a [routerLink]="['/gestion/produits', p.id, 'modifier']" class="lien-a">Modifier</a>
+                <button (click)="basculerActif(p)" class="lien-a">{{ p.actif ? 'Désactiver' : 'Activer' }}</button>
+                <button (click)="supprimer(p)" class="lien-a danger">Supprimer</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (nombrePages() > 1) {
+      <div class="pagination">
+        <button [disabled]="pg.page <= 1" (click)="allerPage(pg.page - 1)">← Précédent</button>
+        <span>Page {{ pg.page }} / {{ nombrePages() }}</span>
+        <button [disabled]="pg.page >= nombrePages()" (click)="allerPage(pg.page + 1)">Suivant →</button>
+      </div>
+    }
+  }
+} @else {
+  <p class="chargement">Chargement…</p>
+}

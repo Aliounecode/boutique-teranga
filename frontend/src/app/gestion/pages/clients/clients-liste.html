@@ -1,0 +1,63 @@
+<div class="tete-cl">
+  <div>
+    <span class="surtitre">Clientèle</span>
+    <h1>Clients</h1>
+  </div>
+  <button class="btn accent" (click)="modeNouveau.set(!modeNouveau())">+ Nouveau client</button>
+</div>
+
+@if (modeNouveau()) {
+  <form class="carte-nouveau" [formGroup]="formNouveau" (ngSubmit)="creer()">
+    <input type="text" formControlName="nom" placeholder="Nom *">
+    <input type="text" formControlName="prenom" placeholder="Prénom">
+    <input type="tel" formControlName="telephone" placeholder="Téléphone">
+    <button type="submit" class="btn accent">Créer</button>
+  </form>
+}
+
+@if (message()) { <p class="ok-b">{{ message() }}</p> }
+@if (erreur()) { <p class="erreur-b">{{ erreur() }}</p> }
+
+<div class="barre-outils">
+  <input type="search" placeholder="Rechercher (nom, prénom, téléphone…)" (input)="chercher($any($event.target).value)">
+</div>
+
+@if (page(); as pg) {
+  @if (pg.total === 0) {
+    <p class="vide">Aucun client.</p>
+  } @else {
+    <div class="tableau">
+      <table>
+        <thead><tr><th>Nom</th><th>Téléphone</th><th>Depuis</th><th>Statut</th><th></th></tr></thead>
+        <tbody>
+          @for (c of pg.elements; track c.id) {
+            <tr [class.inactif]="!c.actif">
+              <td class="nom">{{ c.nom }} {{ c.prenom }}</td>
+              <td>{{ c.telephone || '—' }}</td>
+              <td class="date">{{ c.date_creation | date:'dd/MM/yyyy' }}</td>
+              <td>
+                @if (c.actif) { <span class="badge vert">Actif</span> }
+                @else { <span class="badge gris">Inactif</span> }
+              </td>
+              <td class="actions">
+                <a [routerLink]="['/gestion/clients', c.id]" class="a">Détail</a>
+                <button class="a" (click)="basculerActif(c)">{{ c.actif ? 'Désactiver' : 'Activer' }}</button>
+                <button class="a danger" (click)="supprimer(c)">Supprimer</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (nombrePages() > 1) {
+      <div class="pagination">
+        <button [disabled]="pg.page <= 1" (click)="allerPage(pg.page - 1)">← Précédent</button>
+        <span>Page {{ pg.page }} / {{ nombrePages() }}</span>
+        <button [disabled]="pg.page >= nombrePages()" (click)="allerPage(pg.page + 1)">Suivant →</button>
+      </div>
+    }
+  }
+} @else {
+  <p class="chargement">Chargement…</p>
+}

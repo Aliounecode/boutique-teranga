@@ -1,0 +1,58 @@
+@if (commande() === undefined) {
+  <p class="chargement">Chargement…</p>
+} @else if (commande() === null) {
+  <p class="vide">Commande introuvable. <a routerLink="/gestion/commandes">Retour</a></p>
+} @else {
+  <div class="det-tete">
+    <a routerLink="/gestion/commandes" class="retour">← Commandes</a>
+    <div class="ligne-t">
+      <h1>{{ commande()!.numero }}</h1>
+      <span class="badge st-{{ commande()!.statut }}">{{ libelleStatut(commande()!.statut) }}</span>
+    </div>
+    <p class="d">{{ commande()!.date_commande | date:'dd/MM/yyyy à HH:mm' }}</p>
+  </div>
+
+  @if (message()) { <p class="ok-b">{{ message() }}</p> }
+  @if (erreur()) { <p class="erreur-b">{{ erreur() }}</p> }
+
+  <div class="det-grille">
+    <section class="carte-d">
+      <h2>Articles</h2>
+      <table>
+        <thead><tr><th>Produit</th><th>Prix unit.</th><th>Qté</th><th>Sous-total</th></tr></thead>
+        <tbody>
+          @for (l of commande()!.lignes; track l.id) {
+            <tr>
+              <td>{{ l.produit_nom }}<span class="v">{{ libelleVariante(l) }}</span></td>
+              <td>{{ l.prix_unitaire | fcfa }}</td>
+              <td>{{ l.quantite }}</td>
+              <td>{{ l.sous_total | fcfa }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+      <div class="total"><span>Total</span><span>{{ commande()!.montant_total | fcfa }}</span></div>
+    </section>
+
+    <aside class="carte-d">
+      <h2>Client</h2>
+      <p class="info"><span>Nom</span>{{ commande()!.client_nom }} {{ commande()!.client_prenom }}</p>
+      <p class="info"><span>Téléphone</span>{{ commande()!.client_telephone }}</p>
+      <p class="info"><span>Paiement</span>{{ libelleMoyen(commande()!.moyen_paiement) }}</p>
+      @if (commande()!.notes) { <p class="info"><span>Note</span>{{ commande()!.notes }}</p> }
+
+      <button type="button" class="btn clair facture-btn" (click)="telechargerFacture()">Télécharger la facture</button>
+
+      @if (commande()!.statut === 'nouvelle') {
+        <div class="actions-d">
+          <button class="btn accent" [disabled]="action()" (click)="accepter()">Accepter</button>
+          <button class="btn clair" [disabled]="action()" (click)="refuser()">Refuser</button>
+        </div>
+      } @else if (commande()!.statut === 'validee') {
+        <div class="actions-d">
+          <button class="btn clair" [disabled]="action()" (click)="annuler()">Annuler la commande</button>
+        </div>
+      }
+    </aside>
+  </div>
+}

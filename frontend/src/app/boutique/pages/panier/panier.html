@@ -1,0 +1,47 @@
+<div class="conteneur panier-page">
+  <div class="tete">
+    <span class="surtitre">Votre sélection</span>
+    <h1 class="titre-section">Panier</h1>
+  </div>
+
+  @if (lignes().length === 0) {
+    <div class="vide">
+      <p>Votre panier est vide.</p>
+      <a routerLink="/catalogue" class="btn">Découvrir le catalogue</a>
+    </div>
+  } @else {
+    <div class="grille-panier">
+      <div class="lignes">
+        @for (l of lignes(); track l.variante_id) {
+          <div class="ligne">
+            <div class="visuel">
+              @if (l.photo) { <img [src]="l.photo" [alt]="l.produit_nom"> }
+              @else { <span class="initiale">{{ l.produit_nom.charAt(0) }}</span> }
+            </div>
+            <div class="infos">
+              <div class="nom">{{ l.produit_nom }}</div>
+              @if (libelle(l)) { <div class="variante">{{ libelle(l) }}</div> }
+              <div class="pu">{{ l.prix_unitaire | fcfa }}</div>
+            </div>
+            <div class="quantite">
+              <button (click)="diminuer(l)" aria-label="Diminuer">−</button>
+              <span>{{ l.quantite }}</span>
+              <button (click)="augmenter(l)" aria-label="Augmenter">+</button>
+            </div>
+            <div class="sous-total">{{ (l.prix_unitaire * l.quantite) | fcfa }}</div>
+            <button class="retirer" (click)="retirer(l.variante_id)" aria-label="Retirer">✕</button>
+          </div>
+        }
+        <button class="vider-lien" (click)="vider()">Vider le panier</button>
+      </div>
+
+      <aside class="recap">
+        <h3>Récapitulatif</h3>
+        <div class="ligne-recap"><span>Sous-total</span><span>{{ total() | fcfa }}</span></div>
+        <div class="ligne-recap total"><span>Total</span><span>{{ total() | fcfa }}</span></div>
+        <a routerLink="/commande" class="btn accent bloc">Passer la commande</a>
+        <a routerLink="/catalogue" class="continuer">← Continuer mes achats</a>
+      </aside>
+    </div>
+  }
+</div>

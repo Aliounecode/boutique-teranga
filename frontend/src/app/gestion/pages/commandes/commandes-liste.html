@@ -1,0 +1,58 @@
+<div class="tete-c">
+  <div>
+    <span class="surtitre">Boutique en ligne</span>
+    <h1>Commandes</h1>
+  </div>
+  <select (change)="filtrer($any($event.target).value)">
+    @for (s of statuts; track s.valeur) { <option [value]="s.valeur">{{ s.libelle }}</option> }
+  </select>
+</div>
+
+@if (message()) { <p class="ok-b">{{ message() }}</p> }
+@if (erreur()) { <p class="erreur-b">{{ erreur() }}</p> }
+
+@if (page(); as pg) {
+  @if (pg.total === 0) {
+    <p class="vide">Aucune commande.</p>
+  } @else {
+    <div class="tableau">
+      <table>
+        <thead>
+          <tr><th>N°</th><th>Date</th><th>Client</th><th>Art.</th><th>Paiement</th><th>Total</th><th>Statut</th><th></th></tr>
+        </thead>
+        <tbody>
+          @for (c of pg.elements; track c.id) {
+            <tr>
+              <td class="num">{{ c.numero }}</td>
+              <td class="date">{{ c.date_commande | date:'dd/MM/yy HH:mm' }}</td>
+              <td>{{ c.client_nom }}<span class="tel">{{ c.client_telephone }}</span></td>
+              <td>{{ c.nombre_articles }}</td>
+              <td>{{ libelleMoyen(c.moyen_paiement) }}</td>
+              <td>{{ c.montant_total | fcfa }}</td>
+              <td><span class="badge st-{{ c.statut }}">{{ libelleStatut(c.statut) }}</span></td>
+              <td class="actions">
+                @if (c.statut === 'nouvelle') {
+                  <button class="a acc" (click)="accepter(c)">Accepter</button>
+                  <button class="a ref" (click)="refuser(c)">Refuser</button>
+                } @else if (c.statut === 'validee') {
+                  <button class="a ann" (click)="annuler(c)">Annuler</button>
+                }
+                <a [routerLink]="['/gestion/commandes', c.id]" class="a det">Détail</a>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (nombrePages() > 1) {
+      <div class="pagination">
+        <button [disabled]="pg.page <= 1" (click)="allerPage(pg.page - 1)">← Précédent</button>
+        <span>Page {{ pg.page }} / {{ nombrePages() }}</span>
+        <button [disabled]="pg.page >= nombrePages()" (click)="allerPage(pg.page + 1)">Suivant →</button>
+      </div>
+    }
+  }
+} @else {
+  <p class="chargement">Chargement…</p>
+}

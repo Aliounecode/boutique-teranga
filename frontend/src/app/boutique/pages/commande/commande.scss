@@ -1,0 +1,36 @@
+:host { display: block; }
+.commande-page { padding: 50px 28px 90px; }
+.tete { margin-bottom: 34px; }
+.vide { text-align: center; padding: 60px 0; }
+.vide p { color: var(--texte-doux); font-size: 1.1rem; margin-bottom: 24px; }
+
+.grille-commande { display: grid; grid-template-columns: 1fr 360px; gap: 48px; align-items: start; }
+
+.form h3, .recap h3 { font-family: var(--serif); font-size: 1.4rem; font-weight: 500; margin-bottom: 20px; }
+.champ { margin-bottom: 18px; }
+.champ label { display: block; font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--texte-doux); margin-bottom: 7px; }
+.champ input, .champ select, .champ textarea {
+  width: 100%; border: 1px solid var(--bordure); background: var(--surface);
+  padding: 12px 14px; font-family: var(--sans); font-size: 0.95rem; color: var(--texte);
+}
+.champ textarea { resize: vertical; }
+.champ input:focus, .champ select:focus, .champ textarea:focus { outline: none; border-color: var(--accent); }
+.champ input.invalide { border-color: var(--accent); background: #FCF4F1; }
+.champ small { color: var(--accent-fonce); font-size: 0.78rem; margin-top: 5px; display: block; }
+.erreur { background: #F7E4DE; border: 1px solid var(--accent); color: var(--accent-fonce); padding: 12px 14px; font-size: 0.9rem; margin-bottom: 16px; }
+.btn.bloc { display: flex; justify-content: center; width: 100%; margin-top: 8px; }
+
+.recap { background: var(--surface); border: 1px solid var(--bordure); padding: 28px; position: sticky; top: 100px; }
+.art { display: flex; gap: 10px; padding: 9px 0; font-size: 0.9rem; border-bottom: 1px solid var(--bordure); }
+.art .q { color: var(--texte-doux); }
+.art .n { flex: 1; }
+.art .n em { display: block; font-style: normal; font-size: 0.78rem; color: var(--texte-doux); }
+.art .p { white-space: nowrap; }
+.ligne-recap.total { display: flex; justify-content: space-between; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--bordure); font-family: var(--serif); font-size: 1.15rem; }
+
+.confirmation { text-align: center; max-width: 520px; margin: 40px auto; padding: 40px 0; }
+.confirmation .coche { width: 70px; height: 70px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 2rem; display: grid; place-items: center; margin: 0 auto 24px; }
+.confirmation h1 { margin-bottom: 16px; }
+.confirmation p { color: var(--texte-doux); line-height: 1.7; margin-bottom: 28px; }
+
+@media (max-width: 860px) { .grille-commande { grid-template-columns: 1fr; } .recap { position: static; } }

@@ -1,0 +1,80 @@
+<div class="conteneur cat-entete">
+  <span class="surtitre">Boutique</span>
+  <h1 class="titre-section">Le catalogue</h1>
+</div>
+
+<div class="conteneur cat-corps">
+  <aside class="filtres">
+    <div class="groupe">
+      <label>Recherche</label>
+      <input #q type="search" placeholder="Nom du produit…" (change)="definirRecherche(q.value)">
+    </div>
+
+    <div class="groupe">
+      <label>Catégories</label>
+      <ul class="liste-cat">
+        <li>
+          <button [class.actif]="!filtres().categorie_id" (click)="definirCategorie(undefined)">Toutes</button>
+        </li>
+        @for (c of categoriesPlates(); track c.id) {
+          <li [style.padding-left.px]="c.niveau * 14">
+            <button [class.actif]="filtres().categorie_id === c.id" (click)="definirCategorie(c.id)">{{ c.nom }}</button>
+          </li>
+        }
+      </ul>
+    </div>
+
+    <div class="groupe">
+      <label>Prix (FCFA)</label>
+      <div class="prix-plage">
+        <input #pmin type="number" min="0" placeholder="Min" (change)="definirPrixMin(pmin.value)">
+        <span>—</span>
+        <input #pmax type="number" min="0" placeholder="Max" (change)="definirPrixMax(pmax.value)">
+      </div>
+    </div>
+
+    <div class="groupe">
+      <label class="case"><input type="checkbox" [checked]="!!filtres().en_promotion" (change)="basculerPromo()"> En promotion</label>
+      <label class="case"><input type="checkbox" [checked]="!!filtres().en_stock" (change)="basculerStock()"> En stock uniquement</label>
+    </div>
+
+    <button class="reinit" (click)="reinitialiser()">Réinitialiser</button>
+  </aside>
+
+  <div class="resultats">
+    <div class="barre-tri">
+      <span class="compte">
+        @if (page()) { {{ page()!.total }} produit(s) } @else { … }
+      </span>
+      <label class="tri">
+        Trier :
+        <select #s [value]="filtres().tri" (change)="definirTri(s.value)">
+          <option value="recent">Nouveautés</option>
+          <option value="prix_asc">Prix croissant</option>
+          <option value="prix_desc">Prix décroissant</option>
+          <option value="nom">Nom (A → Z)</option>
+        </select>
+      </label>
+    </div>
+
+    @if (chargement() && !page()) {
+      <p class="etat">Chargement…</p>
+    } @else if (page() && page()!.total === 0) {
+      <p class="etat">Aucun produit ne correspond à votre recherche.</p>
+    } @else {
+      <div class="grille" [class.attenue]="chargement()">
+        @for (p of page()?.elements ?? []; track p.id) {
+          <bq-carte-produit [produit]="p" />
+        }
+      </div>
+
+      @if (nombrePages() > 1) {
+        <div class="pagination">
+          <button [disabled]="page()!.page <= 1" (click)="allerPage(page()!.page - 1)">← Précédent</button>
+          <span>Page {{ page()!.page }} / {{ nombrePages() }}</span>
+          <button [disabled]="page()!.page >= nombrePages()" (click)="allerPage(page()!.page + 1)">Suivant →</button>
+        </div>
+      }
+    }
+  </div>
+</div>

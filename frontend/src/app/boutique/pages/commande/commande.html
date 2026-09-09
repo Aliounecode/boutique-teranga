@@ -1,0 +1,77 @@
+<div class="conteneur commande-page">
+  @if (confirmee(); as cmd) {
+    <div class="confirmation">
+      <div class="coche">✓</div>
+      <h1 class="titre-section">Commande envoyée&nbsp;!</h1>
+      <p>Merci&nbsp;! Votre commande <strong>{{ cmd.numero }}</strong> a bien été enregistrée. Nous vous contacterons au <strong>{{ cmd.client_telephone }}</strong> pour la confirmer.</p>
+      <a routerLink="/catalogue" class="btn accent">Continuer mes achats</a>
+    </div>
+  } @else {
+    <div class="tete">
+      <span class="surtitre">Finaliser</span>
+      <h1 class="titre-section">Votre commande</h1>
+    </div>
+
+    @if (lignes().length === 0) {
+      <div class="vide">
+        <p>Votre panier est vide.</p>
+        <a routerLink="/catalogue" class="btn">Découvrir le catalogue</a>
+      </div>
+    } @else {
+      <div class="grille-commande">
+        <form class="form" [formGroup]="formulaire" (ngSubmit)="soumettre()">
+          <h3>Vos coordonnées</h3>
+
+          <div class="champ">
+            <label>Nom *</label>
+            <input type="text" formControlName="client_nom" [class.invalide]="estInvalide('client_nom')">
+            @if (estInvalide('client_nom')) { <small>Le nom est obligatoire.</small> }
+          </div>
+
+          <div class="champ">
+            <label>Prénom</label>
+            <input type="text" formControlName="client_prenom">
+          </div>
+
+          <div class="champ">
+            <label>Téléphone *</label>
+            <input type="tel" formControlName="client_telephone" [class.invalide]="estInvalide('client_telephone')">
+            @if (estInvalide('client_telephone')) { <small>Le téléphone est obligatoire.</small> }
+          </div>
+
+          <div class="champ">
+            <label>Moyen de paiement *</label>
+            <select formControlName="moyen_paiement">
+              @for (m of moyens; track m.valeur) {
+                <option [value]="m.valeur">{{ m.libelle }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="champ">
+            <label>Note (facultatif)</label>
+            <textarea formControlName="notes" rows="3" placeholder="Précision de livraison, taille, etc."></textarea>
+          </div>
+
+          @if (erreur()) { <p class="erreur">{{ erreur() }}</p> }
+
+          <button type="submit" class="btn accent bloc" [disabled]="envoi()">
+            {{ envoi() ? 'Envoi…' : 'Confirmer la commande' }}
+          </button>
+        </form>
+
+        <aside class="recap">
+          <h3>Récapitulatif</h3>
+          @for (l of lignes(); track l.variante_id) {
+            <div class="art">
+              <span class="q">{{ l.quantite }}×</span>
+              <span class="n">{{ l.produit_nom }}@if (libelle(l)) { <em>{{ libelle(l) }}</em> }</span>
+              <span class="p">{{ (l.prix_unitaire * l.quantite) | fcfa }}</span>
+            </div>
+          }
+          <div class="ligne-recap total"><span>Total</span><span>{{ total() | fcfa }}</span></div>
+        </aside>
+      </div>
+    }
+  }
+</div>

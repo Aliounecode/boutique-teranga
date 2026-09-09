@@ -1,0 +1,33 @@
+:host { display: block; }
+.chargement, .vide { color: var(--texte-doux); padding: 60px 0; text-align: center; }
+.vide a { color: var(--accent); }
+.det-tete { margin-bottom: 22px; }
+.det-tete .retour { font-size: 0.84rem; color: var(--texte-doux); }
+.det-tete .retour:hover { color: var(--accent); }
+.ligne-t { display: flex; align-items: center; gap: 14px; margin-top: 8px; }
+.ligne-t h1 { font-family: var(--serif); font-size: 2rem; font-weight: 500; }
+.det-tete .d { color: var(--texte-doux); font-size: 0.9rem; margin-top: 4px; }
+.ok-b { background: #E4EDE2; border: 1px solid #7FA184; color: #3F6B45; padding: 11px 14px; font-size: 0.9rem; margin-bottom: 14px; }
+.erreur-b { background: #F7E4DE; border: 1px solid var(--accent); color: var(--accent-fonce); padding: 11px 14px; font-size: 0.9rem; margin-bottom: 14px; }
+
+.badge { font-size: 0.68rem; letter-spacing: 0.05em; text-transform: uppercase; padding: 4px 10px; border-radius: 2px; }
+.badge.st-nouvelle { background: #FBEAD9; color: #9A5B1E; }
+.badge.st-validee { background: #E4EDE2; color: #3F6B45; }
+.badge.st-refusee { background: #ECE6DE; color: var(--texte-doux); }
+.badge.st-annulee { background: #F7E1DC; color: var(--accent-fonce); }
+
+.det-grille { display: grid; grid-template-columns: 1.7fr 1fr; gap: 20px; align-items: start; }
+.carte-d { background: var(--surface); border: 1px solid var(--bordure); padding: 26px; }
+.carte-d h2 { font-family: var(--serif); font-size: 1.3rem; font-weight: 500; margin-bottom: 16px; }
+.carte-d table { width: 100%; border-collapse: collapse; }
+.carte-d th { text-align: left; font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--texte-doux); padding: 9px 8px; border-bottom: 1px solid var(--bordure); font-weight: 500; }
+.carte-d td { padding: 10px 8px; border-bottom: 1px solid var(--bordure); font-size: 0.9rem; }
+.carte-d td .v { display: block; font-size: 0.78rem; color: var(--texte-doux); }
+.total { display: flex; justify-content: space-between; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--bordure); font-family: var(--serif); font-size: 1.2rem; }
+.info { display: flex; flex-direction: column; padding: 9px 0; border-bottom: 1px solid var(--bordure); font-size: 0.94rem; }
+.info:last-of-type { border-bottom: none; }
+.info span { font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--texte-doux); margin-bottom: 3px; }
+.actions-d { display: flex; flex-direction: column; gap: 10px; margin-top: 22px; }
+.actions-d .btn { display: flex; justify-content: center; width: 100%; }
+.actions-d .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+@media (max-width: 860px) { .det-grille { grid-template-columns: 1fr; } }

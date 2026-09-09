@@ -1,0 +1,227 @@
+:host {
+  display: block;
+}
+.form-tete {
+  margin-bottom: 24px;
+}
+.form-tete .retour {
+  font-size: 0.84rem;
+  color: var(--texte-doux);
+}
+.form-tete .retour:hover {
+  color: var(--accent);
+}
+.form-tete h1 {
+  font-family: var(--serif);
+  font-size: 2.2rem;
+  font-weight: 500;
+  margin-top: 8px;
+}
+.colonnes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.carte-f {
+  background: var(--surface);
+  border: 1px solid var(--bordure);
+  padding: 26px;
+  margin-bottom: 20px;
+}
+.carte-f h2 {
+  font-family: var(--serif);
+  font-size: 1.3rem;
+  font-weight: 500;
+  margin-bottom: 18px;
+}
+.champ {
+  margin-bottom: 16px;
+}
+.champ label {
+  display: block;
+  font-size: 0.76rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--texte-doux);
+  margin-bottom: 6px;
+}
+.champ input,
+.champ select,
+.champ textarea {
+  width: 100%;
+  border: 1px solid var(--bordure);
+  background: var(--fond);
+  padding: 11px 13px;
+  font-family: var(--sans);
+  font-size: 0.94rem;
+  color: var(--texte);
+}
+.champ textarea {
+  resize: vertical;
+}
+.champ input:focus,
+.champ select:focus,
+.champ textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.champ small {
+  font-size: 0.76rem;
+  color: var(--texte-doux);
+  margin-top: 5px;
+  display: block;
+}
+.case {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 0.92rem;
+  margin: 6px 0 16px;
+  cursor: pointer;
+}
+.case input {
+  width: auto;
+}
+.note {
+  font-size: 0.86rem;
+  color: var(--texte-doux);
+  margin-bottom: 14px;
+}
+.var-lecture {
+  list-style: none;
+}
+.var-lecture li {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--bordure);
+  font-size: 0.92rem;
+}
+.var-lecture li:last-child {
+  border-bottom: none;
+}
+.variantes-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.var-ligne {
+  display: grid;
+  grid-template-columns: 1fr 1fr 90px 120px 42px;
+  gap: 10px;
+  align-items: center;
+}
+.var-ligne input {
+  border: 1px solid var(--bordure);
+  background: var(--fond);
+  padding: 10px 12px;
+  font-family: var(--sans);
+  font-size: 0.9rem;
+  color: var(--texte);
+  width: 100%;
+}
+.sup-var {
+  background: none;
+  border: 1px solid var(--bordure);
+  cursor: pointer;
+  height: 40px;
+  color: var(--texte-doux);
+}
+.sup-var:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.sup-var:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+.ajout-var {
+  background: none;
+  border: 1px dashed var(--bordure);
+  padding: 11px 18px;
+  font-family: var(--sans);
+  font-size: 0.84rem;
+  cursor: pointer;
+  color: var(--texte-doux);
+  width: 100%;
+  transition: all var(--transi);
+}
+.ajout-var:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.erreur-b {
+  background: #f7e4de;
+  border: 1px solid var(--accent);
+  color: var(--accent-fonce);
+  padding: 12px 14px;
+  font-size: 0.9rem;
+  margin-bottom: 16px;
+}
+.actions-f {
+  display: flex;
+  gap: 14px;
+  justify-content: flex-end;
+}
+@media (max-width: 760px) {
+  .colonnes {
+    grid-template-columns: 1fr;
+  }
+  .var-ligne {
+    grid-template-columns: 1fr 1fr;
+  }
+  .sup-var {
+    grid-column: span 2;
+    height: 34px;
+  }
+}
+.ajout-photos {
+  display: inline-block;
+  padding: 11px 20px;
+  border: 1px dashed var(--bordure);
+  color: var(--texte-doux);
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all var(--transi);
+}
+.ajout-photos:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.apercus {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 16px;
+}
+.apercu {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  border: 1px solid var(--bordure);
+  overflow: hidden;
+}
+.apercu img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.apercu button {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(43, 35, 32, 0.78);
+  color: #fff;
+  font-size: 0.72rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.apercu button:hover {
+  background: var(--accent);
+}

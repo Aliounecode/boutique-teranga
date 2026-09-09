@@ -1,0 +1,115 @@
+<div class="stock-tete">
+  <span class="surtitre">Inventaire</span>
+  <h1>Stock</h1>
+</div>
+
+@if (message()) { <p class="ok-b">{{ message() }}</p> }
+@if (erreur()) { <p class="erreur-b">{{ erreur() }}</p> }
+
+<div class="stock-grille">
+  <section class="carte-s">
+    <h2>Réapprovisionner un produit</h2>
+    <div class="recherche">
+      <input type="search" placeholder="Rechercher un produit…" (input)="chercher($any($event.target).value)">
+      @if (resultats().length) {
+        <ul class="resultats">
+          @for (p of resultats(); track p.id) {
+            <li><button type="button" (click)="selectionner(p.id)">{{ p.nom }} <span>{{ p.reference }}</span></button></li>
+          }
+        </ul>
+      }
+    </div>
+
+    @if (produitSel(); as prod) {
+      <div class="prod-var">
+        <h3>{{ prod.nom }}</h3>
+        <table>
+          <thead><tr><th>Déclinaison</th><th>Stock</th><th>Réappro.</th><th>Corriger</th></tr></thead>
+          <tbody>
+            @for (v of prod.variantes; track v.id) {
+              <tr [class.inactif]="!v.actif">
+                <td>{{ libelleVariante(v) }}</td>
+                <td><span [class.rupture]="v.quantite_disponible <= 0">{{ v.quantite_disponible }}</span></td>
+                <td class="act">
+                  <input #qr type="number" min="1" placeholder="Qté">
+                  <button type="button" (click)="reapprovisionner(v.id, +qr.value); qr.value=''">Ajouter</button>
+                </td>
+                <td class="act">
+                  <input #qc type="number" min="0" placeholder="Exact">
+                  <button type="button" (click)="corriger(v.id, +qc.value); qc.value=''">Corriger</button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <p class="aide-s">Recherchez un produit pour ajuster son stock.</p>
+    }
+  </section>
+
+  <section class="carte-s">
+    <h2>Alertes</h2>
+    @if (alertes().length) {
+      <ul class="liste-alertes">
+        @for (a of alertes(); track a.variante_id) {
+          <li>
+            <button type="button" class="lien-alerte" (click)="selectionner(a.produit_id)">
+              <span class="np">{{ a.produit_nom }}</span>
+              <span class="vp">{{ libelleVariante(a) }}</span>
+            </button>
+            @if (a.en_rupture) {
+              <span class="badge rouge">Rupture</span>
+            } @else {
+              <span class="badge jaune">{{ a.quantite_disponible }} / {{ a.stock_minimum }}</span>
+            }
+          </li>
+        }
+      </ul>
+    } @else {
+      <p class="aide-s">Aucune alerte — tous les stocks sont au-dessus du seuil.</p>
+    }
+  </section>
+</div>
+
+<section class="carte-s historique">
+  <div class="hist-tete">
+    <h2>Historique des mouvements</h2>
+    <select (change)="filtrer($any($event.target).value)">
+      @for (t of typesMouvement; track t.valeur) { <option [value]="t.valeur">{{ t.libelle }}</option> }
+    </select>
+  </div>
+
+  @if (mouvements(); as mv) {
+    @if (mv.total === 0) {
+      <p class="aide-s">Aucun mouvement pour ce filtre.</p>
+    } @else {
+      <div class="tableau">
+        <table>
+          <thead><tr><th>Date</th><th>Type</th><th>Produit</th><th>Avant → Après</th><th>Qté</th><th>Motif</th></tr></thead>
+          <tbody>
+            @for (m of mv.elements; track m.id) {
+              <tr>
+                <td class="date">{{ m.date_mouvement | date:'dd/MM/yy HH:mm' }}</td>
+                <td><span class="badge type-{{ m.type_mouvement }}">{{ libelleMouvement(m.type_mouvement) }}</span></td>
+                <td>{{ m.produit_nom }} <span class="vp">{{ libelleVariante(m) }}</span></td>
+                <td>{{ m.quantite_avant }} → <strong>{{ m.quantite_apres }}</strong></td>
+                <td>{{ m.quantite }}</td>
+                <td class="motif">{{ m.motif || m.reference_document || '—' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      @if (nombrePagesMvt() > 1) {
+        <div class="pagination">
+          <button [disabled]="mv.page <= 1" (click)="allerPageMvt(mv.page - 1)">← Précédent</button>
+          <span>Page {{ mv.page }} / {{ nombrePagesMvt() }}</span>
+          <button [disabled]="mv.page >= nombrePagesMvt()" (click)="allerPageMvt(mv.page + 1)">Suivant →</button>
+        </div>
+      }
+    }
+  } @else {
+    <p class="aide-s">Chargement…</p>
+  }
+</section>

@@ -1,0 +1,84 @@
+@if (produit() === undefined) {
+  <div class="conteneur etat">Chargement…</div>
+} @else if (produit() === null) {
+  <div class="conteneur etat">
+    Produit introuvable. <a routerLink="/catalogue">Retour au catalogue</a>
+  </div>
+} @else {
+  <div class="conteneur fiche">
+    <nav class="fil">
+      <a routerLink="/">Accueil</a> / <a routerLink="/catalogue">Catalogue</a> / <span>{{ produit()!.nom }}</span>
+    </nav>
+
+    <div class="fiche-grille">
+      <div class="galerie">
+        <div class="principale">
+          @if (photoActive()) {
+            <img [src]="photoActive()" [alt]="produit()!.nom">
+          } @else {
+            <span class="initiale">{{ produit()!.nom.charAt(0) }}</span>
+          }
+        </div>
+        @if (produit()!.photos.length > 1) {
+          <div class="miniatures">
+            @for (ph of produit()!.photos; track ph.id) {
+              <button class="mini" [class.actif]="photoActive() === ph.url" (click)="photoActive.set(ph.url)">
+                <img [src]="ph.url" [alt]="produit()!.nom">
+              </button>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="infos">
+        <span class="surtitre">{{ produit()!.categorie.nom }}</span>
+        <h1>{{ produit()!.nom }}</h1>
+
+        <div class="prix">
+          @if (produit()!.en_promotion && produit()!.prix_promo) {
+            <span class="barre">{{ produit()!.prix | fcfa }}</span>
+            <span class="promo">{{ produit()!.prix_promo | fcfa }}</span>
+          } @else {
+            {{ produit()!.prix_effectif | fcfa }}
+          }
+        </div>
+
+        @if (produit()!.description) {
+          <p class="desc">{{ produit()!.description }}</p>
+        }
+
+        @if (!produit()!.disponible_achat) {
+          <p class="statut rupture">
+            @if (produit()!.statut === 'bientot_disponible') { Bientôt disponible } @else { En rupture de stock }
+          </p>
+        }
+
+        @if (variantesActives().length) {
+          <div class="variantes">
+            <label>Choisir une déclinaison</label>
+            <div class="chips">
+              @for (v of variantesActives(); track v.id) {
+                <button
+                  class="chip"
+                  [class.actif]="varianteSelectionnee()?.id === v.id"
+                  [class.epuise]="v.quantite_disponible <= 0"
+                  [disabled]="v.quantite_disponible <= 0"
+                  (click)="varianteSelectionnee.set(v)">
+                  {{ libelleVariante(v) }}
+                </button>
+              }
+            </div>
+            @if (varianteSelectionnee()) {
+              <p class="dispo">{{ varianteSelectionnee()!.quantite_disponible }} en stock</p>
+            }
+          </div>
+        }
+
+        <button class="btn accent ajouter" [disabled]="!peutAjouter()" (click)="ajouter()">
+          Ajouter au panier
+        </button>
+        @if (message()) { <p class="msg">{{ message() }}</p> }
+      </div>
+    </div>
+  </div>
+}

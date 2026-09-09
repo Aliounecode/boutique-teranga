@@ -1,0 +1,155 @@
+<div class="form-tete">
+  <a routerLink="/gestion/produits" class="retour">← Produits</a>
+  <h1>{{ estEdition() ? 'Modifier le produit' : 'Nouveau produit' }}</h1>
+</div>
+
+<form [formGroup]="form" (ngSubmit)="soumettre()" class="form-produit">
+  <div class="colonnes">
+    <section class="carte-f">
+      <h2>Informations</h2>
+      <div class="champ">
+        <label>Nom *</label>
+        <input type="text" formControlName="nom" />
+      </div>
+      <div class="champ">
+        <label>Description</label>
+        <textarea formControlName="description" rows="3"></textarea>
+      </div>
+      <div class="champ">
+        <label>Catégorie *</label>
+        <select formControlName="categorie_id">
+          <option [ngValue]="0" disabled>— Choisir —</option>
+          @for (c of categories(); track c.id) {
+            <option [ngValue]="c.id">{{ c.nom }}</option>
+          }
+        </select>
+      </div>
+      <div class="champ">
+        <label>Statut</label>
+        <select formControlName="statut">
+          <option value="disponible">Disponible</option>
+          <option value="bientot_disponible">Bientôt disponible</option>
+        </select>
+      </div>
+      @if (estEdition()) {
+        <label class="case"
+          ><input type="checkbox" formControlName="actif" /> Produit actif (visible en
+          boutique)</label
+        >
+      }
+    </section>
+
+    <section class="carte-f">
+      <h2>Prix</h2>
+      <div class="champ">
+        <label>Prix (FCFA) *</label>
+        <input type="number" formControlName="prix" min="0" />
+      </div>
+      <label class="case"
+        ><input type="checkbox" formControlName="en_promotion" /> En promotion</label
+      >
+      @if (form.controls.en_promotion.value) {
+        <div class="champ">
+          <label>Prix promotionnel (FCFA)</label>
+          <input type="number" formControlName="prix_promo" min="0" />
+          <small>Doit être inférieur au prix normal.</small>
+        </div>
+      }
+    </section>
+  </div>
+
+  <section class="carte-f">
+    <h2>Variantes</h2>
+    @if (estEdition()) {
+      <p class="note">
+        La modification des variantes et du stock arrive à une prochaine étape. Variantes actuelles
+        :
+      </p>
+      <ul class="var-lecture">
+        @for (v of variantesLecture(); track $index) {
+          <li>
+            {{ v.libelle }} — <strong>{{ v.stock }}</strong> en stock
+          </li>
+        } @empty {
+          <li>Aucune variante.</li>
+        }
+      </ul>
+    } @else {
+      <label class="case"
+        ><input type="checkbox" formControlName="a_tailles" /> Ce produit a des tailles
+        (chaussures)</label
+      >
+      <p class="note">
+        Ajoutez au moins une variante. Laissez couleur/taille vides pour un modèle unique ; une
+        taille est requise si le produit a des pointures.
+      </p>
+      <div formArrayName="variantes" class="variantes-edit">
+        @for (grp of variantes.controls; track $index) {
+          <div class="var-ligne" [formGroupName]="$index">
+            <input type="text" formControlName="couleur" placeholder="Couleur" />
+            <input type="text" formControlName="taille" placeholder="Taille" />
+            <input type="number" formControlName="quantite_disponible" placeholder="Qté" min="0" />
+            <input
+              type="number"
+              formControlName="stock_minimum"
+              placeholder="Seuil alerte"
+              min="0"
+            />
+            <button
+              type="button"
+              class="sup-var"
+              (click)="retirerVariante($index)"
+              [disabled]="variantes.length <= 1"
+            >
+              ✕
+            </button>
+          </div>
+        }
+      </div>
+      <button type="button" class="ajout-var" (click)="ajouterVariante()">
+        + Ajouter une variante
+      </button>
+    }
+  </section>
+
+  @if (!estEdition()) {
+    <section class="carte-f">
+      <h2>Photos</h2>
+      <p class="note">
+        Ajoutez une ou plusieurs photos (facultatif). Elles seront enregistrées avec le produit.
+      </p>
+      <label class="ajout-photos">
+        <input type="file" accept="image/*" multiple (change)="ajouterPhotos($event)" hidden />
+        + Choisir des photos
+      </label>
+      @if (photosEnAttente().length) {
+        <div class="apercus">
+          @for (ph of photosEnAttente(); track ph.apercu) {
+            <div class="apercu">
+              <img [src]="ph.apercu" alt="" />
+              <button type="button" (click)="retirerPhoto($index)" aria-label="Retirer">✕</button>
+            </div>
+          }
+        </div>
+      }
+    </section>
+  }
+
+  @if (estEdition()) {
+    <section class="carte-f">
+      <h2>Photos</h2>
+      <g-photos [produitId]="id()!" />
+    </section>
+  }
+
+  @if (erreur()) {
+    <p class="erreur-b">{{ erreur() }}</p>
+  }
+
+  <div class="actions-f">
+    <a routerLink="/gestion/produits" class="btn clair">Annuler</a>
+    <button type="submit" class="btn accent" [disabled]="envoi()">
+      {{ envoi() ? 'Enregistrement…' : estEdition() ? 'Enregistrer' : 'Créer le produit' }}
+    </button>
+  </div>
+</form>

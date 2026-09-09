@@ -1,0 +1,270 @@
+<!-- =========================================================
+     HERO
+========================================================= -->
+
+<section class="hero">
+  <div class="conteneur">
+    <div class="hero-grille">
+      <!-- TEXTE -->
+
+      <div class="hero-texte">
+        <span class="surtitre"> Nouvelle collection · 2026 </span>
+
+        <h1>
+          L'élégance,<br />
+          au bout des <em>doigts</em>.
+        </h1>
+
+        <p>
+          Sacs et chaussures sélectionnés pour la femme d'aujourd'hui. Des pièces raffinées, pensées
+          pour durer, à porter chaque jour comme les grands soirs.
+        </p>
+
+        <div class="hero-cta">
+          <a routerLink="/catalogue" class="btn"> Découvrir les sacs </a>
+
+          <a routerLink="/catalogue" class="btn clair"> Voir les chaussures </a>
+        </div>
+      </div>
+
+      <!-- IMAGE DU HERO -->
+
+      <div class="hero-visuel">
+        <div class="cadre">
+          <img src="images/hero-sac.jpg" alt="Sac de la nouvelle collection" />
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================
+     RÉASSURANCE
+========================================================= -->
+
+<div class="reassurance">
+  <div class="conteneur grille-rea">
+    <div class="rea">
+      <strong>Paiement mobile</strong>
+      Wave · OM · Free Money
+    </div>
+
+    <div class="rea">
+      <strong>Livraison Dakar</strong>
+      Rapide et suivie
+    </div>
+
+    <div class="rea">
+      <strong>Qualité choisie</strong>
+      Pièces sélectionnées
+    </div>
+
+    <div class="rea">
+      <strong>Service client</strong>
+      À votre écoute
+    </div>
+  </div>
+</div>
+
+<!-- =========================================================
+     NOS UNIVERS
+========================================================= -->
+
+<section class="bloc">
+  <div class="conteneur">
+    <div class="entete-bloc">
+      <span class="surtitre"> Explorer </span>
+
+      <h2 class="titre-section">Nos univers</h2>
+
+      <hr class="filet centre" />
+    </div>
+
+    <div class="univers">
+      @for (cat of categories(); track cat.id) {
+        <a routerLink="/catalogue" [queryParams]="{ categorie: cat.id }" class="carte-univers">
+          <!-- IMAGE -->
+
+          <div
+            class="fond"
+            [style.background-image]="'url(' + getImageCategorie(cat.nom) + ')'"
+          ></div>
+
+          <!-- VOILE SUR L'IMAGE -->
+
+          <div class="overlay"></div>
+
+          <!-- CONTENU -->
+
+          <div class="contenu">
+            <h3>
+              {{ cat.nom }}
+            </h3>
+
+            @if (cat.sous_categories.length) {
+              <div class="chips">
+                @for (sous of cat.sous_categories.slice(0, 4); track sous.id) {
+                  <span>
+                    {{ sous.nom }}
+                  </span>
+                }
+              </div>
+            }
+
+            <span class="lien-fleche"> Découvrir la collection → </span>
+          </div>
+        </a>
+      } @empty {
+        <p class="vide">Les univers apparaîtront ici une fois les catégories créées côté gérant.</p>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================
+     NOUVEAUTÉS
+========================================================= -->
+
+<section class="bloc surface">
+  <div class="conteneur">
+    <div class="entete-bloc">
+      <span class="surtitre"> Fraîchement arrivés </span>
+
+      <h2 class="titre-section">Nouveautés</h2>
+
+      <hr class="filet centre" />
+    </div>
+
+    @if (nouveautes().length) {
+      <div class="grille-produits">
+        @for (p of nouveautes(); track p.id) {
+          <a [routerLink]="['/produit', p.id]" class="produit">
+            <div class="visuel">
+              @if (p.en_promotion) {
+                <span class="badge"> Promo </span>
+              }
+
+              @if (p.photo_principale) {
+                <img [src]="p.photo_principale" [alt]="p.nom" loading="lazy" />
+              } @else {
+                <span class="initiale">
+                  {{ p.nom.charAt(0) }}
+                </span>
+              }
+            </div>
+
+            <div class="nom">
+              {{ p.nom }}
+            </div>
+
+            <div class="prix">
+              @if (p.en_promotion && p.prix_promo) {
+                <span class="barre">
+                  {{ p.prix | fcfa }}
+                </span>
+
+                <span class="promo">
+                  {{ p.prix_promo | fcfa }}
+                </span>
+              } @else {
+                {{ p.prix_effectif | fcfa }}
+              }
+            </div>
+          </a>
+        }
+      </div>
+
+      <div class="centre-cta">
+        <a routerLink="/catalogue" class="btn clair"> Voir tout le catalogue </a>
+      </div>
+    } @else {
+      <p class="vide">Bientôt de nouveaux articles à découvrir.</p>
+    }
+  </div>
+</section>
+
+<!-- =========================================================
+     OFFRES DU MOMENT
+========================================================= -->
+
+<section class="bloc promo-bande">
+  <div class="conteneur">
+    <div class="entete-bloc">
+      <span class="surtitre"> À ne pas manquer </span>
+
+      <h2 class="titre-section">Offres du moment</h2>
+
+      <hr class="filet centre" />
+    </div>
+
+    @if (promotions().length) {
+      <div class="grille-promotions">
+        @for (p of promotions(); track p.id) {
+          <a [routerLink]="['/produit', p.id]" class="produit promo-produit">
+            <div class="visuel">
+              <span class="badge"> Promo </span>
+
+              @if (p.photo_principale) {
+                <img [src]="p.photo_principale" [alt]="p.nom" loading="lazy" />
+              } @else {
+                <span class="initiale">
+                  {{ p.nom.charAt(0) }}
+                </span>
+              }
+            </div>
+
+            <div class="nom">
+              {{ p.nom }}
+            </div>
+
+            <div class="prix">
+              <span class="barre">
+                {{ p.prix | fcfa }}
+              </span>
+
+              <span class="promo">
+                {{ p.prix_promo | fcfa }}
+              </span>
+            </div>
+          </a>
+        }
+      </div>
+
+      <div class="centre-cta">
+        <a routerLink="/catalogue" [queryParams]="{ promo: 'true' }" class="btn accent">
+          Voir toutes les promotions
+        </a>
+      </div>
+    } @else {
+      <div class="promo-vide">
+        <span class="promo-vide-icon"> ✦ </span>
+
+        <h3>Les prochaines offres arrivent bientôt</h3>
+
+        <p>Retrouvez ici nos meilleures promotions et nos sélections à prix réduit.</p>
+
+        <a routerLink="/catalogue" class="btn clair"> Découvrir le catalogue </a>
+      </div>
+    }
+  </div>
+</section>
+
+<!-- =========================================================
+     NEWSLETTER
+========================================================= -->
+
+<section class="bloc news">
+  <div class="conteneur">
+    <span class="surtitre"> Restons en contact </span>
+
+    <h2 class="titre-section">Les nouveautés en avant-première</h2>
+
+    <p>Inscrivez-vous pour recevoir nos arrivages et offres exclusives, avant tout le monde.</p>
+
+    <form (submit)="$event.preventDefault()">
+      <input type="email" placeholder="Votre adresse e-mail" aria-label="Adresse e-mail" required />
+
+      <button class="btn accent" type="submit">S'inscrire</button>
+    </form>
+  </div>
+</section>

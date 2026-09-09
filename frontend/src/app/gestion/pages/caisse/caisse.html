@@ -1,0 +1,127 @@
+<div class="caisse-tete">
+  <span class="surtitre">Point de vente</span>
+  <h1>Caisse</h1>
+</div>
+
+@if (venteConfirmee(); as v) {
+  <div class="confirmation">
+    <div class="coche">✓</div>
+    <h2>Vente enregistrée</h2>
+    <p class="num">{{ v.numero }}</p>
+    <p class="mt">{{ v.montant_total | fcfa }}</p>
+    <div class="conf-actions">
+      <button class="btn accent" (click)="telechargerFacture(v)">Télécharger la facture</button>
+      <button class="btn clair" (click)="nouvelleVente()">Nouvelle vente</button>
+    </div>
+  </div>
+} @else {
+  <div class="caisse-grille">
+    <div class="gauche">
+      <section class="carte-k">
+        <h2>Ajouter des articles</h2>
+        <div class="recherche">
+          <input type="search" placeholder="Rechercher un produit…" (input)="chercher($any($event.target).value)">
+          @if (resultats().length) {
+            <ul class="resultats">
+              @for (p of resultats(); track p.id) {
+                <li><button type="button" (click)="selectionnerProduit(p.id)">{{ p.nom }} <span>{{ p.reference }}</span></button></li>
+              }
+            </ul>
+          }
+        </div>
+        @if (produitSel(); as prod) {
+          <div class="variantes-k">
+            <h3>{{ prod.nom }}</h3>
+            <div class="chips-var">
+              @for (v of prod.variantes; track v.id) {
+                <button type="button" class="chip-var" [disabled]="v.quantite_disponible <= 0 || !v.actif" (click)="ajouter(v, prod)">
+                  {{ libelleVariante(v) }}
+                  <span class="stock">{{ v.quantite_disponible }} en stock</span>
+                </button>
+              }
+            </div>
+          </div>
+        }
+      </section>
+
+      <section class="carte-k">
+        <h2>Panier de vente</h2>
+        @if (lignes().length === 0) {
+          <p class="aide-k">Aucun article. Recherchez un produit ci-dessus, puis cliquez une déclinaison.</p>
+        } @else {
+          <div class="lignes-k">
+            @for (l of lignes(); track l.variante_id) {
+              <div class="ligne-k">
+                <div class="info">
+                  <span class="n">{{ l.produit_nom }}</span>
+                  <span class="v">{{ libelleVariante(l) }} · {{ l.prix_unitaire | fcfa }}</span>
+                </div>
+                <div class="qte">
+                  <button type="button" (click)="diminuer(l)">−</button>
+                  <span>{{ l.quantite }}</span>
+                  <button type="button" (click)="augmenter(l)" [disabled]="l.quantite >= l.stock_max">+</button>
+                </div>
+                <div class="st">{{ (l.prix_unitaire * l.quantite) | fcfa }}</div>
+                <button type="button" class="sup" (click)="retirer(l.variante_id)">✕</button>
+              </div>
+            }
+          </div>
+        }
+      </section>
+    </div>
+
+    <aside class="droite">
+      <section class="carte-k">
+        <h2>Client</h2>
+        <div class="client-actuel">
+          @if (clientSel(); as c) {
+            <span class="nom-c">{{ c.nom }} {{ c.prenom }}</span>
+            <button type="button" class="lien" (click)="anonyme()">Retirer</button>
+          } @else {
+            <span class="anon">Vente anonyme</span>
+          }
+        </div>
+        <div class="recherche">
+          <input type="search" placeholder="Rechercher un client…" (input)="chercherClient($any($event.target).value)">
+          @if (resultatsClient().length) {
+            <ul class="resultats">
+              @for (c of resultatsClient(); track c.id) {
+                <li><button type="button" (click)="selectionnerClient(c)">{{ c.nom }} {{ c.prenom }} <span>{{ c.telephone }}</span></button></li>
+              }
+            </ul>
+          }
+        </div>
+        @if (!modeNouveauClient()) {
+          <button type="button" class="lien" (click)="modeNouveauClient.set(true)">+ Nouveau client</button>
+        } @else {
+          <form class="form-client" [formGroup]="formClient" (ngSubmit)="creerClient()">
+            <input type="text" formControlName="nom" placeholder="Nom *">
+            <input type="text" formControlName="prenom" placeholder="Prénom">
+            <input type="tel" formControlName="telephone" placeholder="Téléphone">
+            <div class="fc-actions">
+              <button type="button" class="lien" (click)="modeNouveauClient.set(false)">Annuler</button>
+              <button type="submit" class="btn accent pt">Créer</button>
+            </div>
+          </form>
+        }
+      </section>
+
+      <section class="carte-k">
+        <h2>Paiement</h2>
+        <div class="moyens">
+          @for (m of moyens; track m.valeur) {
+            <button type="button" class="moyen" [class.actif]="moyen() === m.valeur" (click)="choisirMoyen(m.valeur)">{{ m.libelle }}</button>
+          }
+        </div>
+      </section>
+
+      <section class="carte-k total-k">
+        <div class="ligne-total"><span>Total</span><span class="mt">{{ total() | fcfa }}</span></div>
+        @if (erreur()) { <p class="erreur-b">{{ erreur() }}</p> }
+        <button type="button" class="btn accent valider" [disabled]="envoi() || lignes().length === 0" (click)="valider()">
+          {{ envoi() ? 'Enregistrement…' : 'Valider la vente' }}
+        </button>
+      </section>
+    </aside>
+  </div>
+}
