@@ -13,6 +13,9 @@ import { AuthClientService } from '../../../coeur/services/auth-client';
         <p class="surtitre">Espace client</p>
         <h1 class="titre">Connexion</h1>
         <hr class="filet" />
+        @if (suiteCommande()) {
+          <div class="info">Connectez-vous (ou créez un compte) pour finaliser votre commande.</div>
+        }
 
         @if (erreur()) {
           <div class="alerte">
@@ -162,6 +165,9 @@ export class ConnexionClient {
   protected readonly erreur = signal<string | null>(null);
   protected readonly info = signal<string | null>(null);
   protected readonly nonVerifie = signal(false);
+  protected readonly suiteCommande = signal(
+    (localStorage.getItem('redirection_post_connexion') ?? '').includes('/commande'),
+  );
 
   protected readonly form = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
@@ -181,7 +187,9 @@ export class ConnexionClient {
     this.auth.connexion(email, mot_de_passe).subscribe({
       next: () => {
         this.enCours.set(false);
-        this.router.navigateByUrl('/mon-compte');
+        const cible = localStorage.getItem('redirection_post_connexion');
+        localStorage.removeItem('redirection_post_connexion');
+        this.router.navigateByUrl(cible || '/mon-compte');
       },
       error: (e) => {
         this.enCours.set(false);

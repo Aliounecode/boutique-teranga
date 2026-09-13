@@ -7,23 +7,43 @@
 } @else {
   <div class="conteneur fiche">
     <nav class="fil">
-      <a routerLink="/">Accueil</a> / <a routerLink="/catalogue">Catalogue</a> / <span>{{ produit()!.nom }}</span>
+      <a routerLink="/">Accueil</a> / <a routerLink="/catalogue">Catalogue</a> /
+      <span>{{ produit()!.nom }}</span>
     </nav>
 
     <div class="fiche-grille">
       <div class="galerie">
         <div class="principale">
           @if (photoActive()) {
-            <img [src]="photoActive()" [alt]="produit()!.nom">
+            <img [src]="photoActive()" [alt]="produit()!.nom" />
+            @if (produit()!.photos.length > 1) {
+              <button
+                type="button"
+                class="fleche gauche"
+                (click)="precedente()"
+                aria-label="Image précédente"
+              >
+                ‹
+              </button>
+              <button
+                type="button"
+                class="fleche droite"
+                (click)="suivante()"
+                aria-label="Image suivante"
+              >
+                ›
+              </button>
+              <span class="compteur">{{ indexPhoto() + 1 }} / {{ produit()!.photos.length }}</span>
+            }
           } @else {
             <span class="initiale">{{ produit()!.nom.charAt(0) }}</span>
           }
         </div>
         @if (produit()!.photos.length > 1) {
           <div class="miniatures">
-            @for (ph of produit()!.photos; track ph.id) {
-              <button class="mini" [class.actif]="photoActive() === ph.url" (click)="photoActive.set(ph.url)">
-                <img [src]="ph.url" [alt]="produit()!.nom">
+            @for (ph of produit()!.photos; track ph.id; let i = $index) {
+              <button class="mini" [class.actif]="indexPhoto() === i" (click)="indexPhoto.set(i)">
+                <img [src]="ph.url" [alt]="produit()!.nom" />
               </button>
             }
           </div>
@@ -49,7 +69,11 @@
 
         @if (!produit()!.disponible_achat) {
           <p class="statut rupture">
-            @if (produit()!.statut === 'bientot_disponible') { Bientôt disponible } @else { En rupture de stock }
+            @if (produit()!.statut === 'bientot_disponible') {
+              Bientôt disponible
+            } @else {
+              En rupture de stock
+            }
           </p>
         }
 
@@ -63,7 +87,8 @@
                   [class.actif]="varianteSelectionnee()?.id === v.id"
                   [class.epuise]="v.quantite_disponible <= 0"
                   [disabled]="v.quantite_disponible <= 0"
-                  (click)="varianteSelectionnee.set(v)">
+                  (click)="varianteSelectionnee.set(v)"
+                >
                   {{ libelleVariante(v) }}
                 </button>
               }
@@ -77,7 +102,9 @@
         <button class="btn accent ajouter" [disabled]="!peutAjouter()" (click)="ajouter()">
           Ajouter au panier
         </button>
-        @if (message()) { <p class="msg">{{ message() }}</p> }
+        @if (message()) {
+          <p class="msg">{{ message() }}</p>
+        }
       </div>
     </div>
   </div>

@@ -3,7 +3,27 @@
     <div class="confirmation">
       <div class="coche">✓</div>
       <h1 class="titre-section">Commande envoyée&nbsp;!</h1>
-      <p>Merci&nbsp;! Votre commande <strong>{{ cmd.numero }}</strong> a bien été enregistrée. Nous vous contacterons au <strong>{{ cmd.client_telephone }}</strong> pour la confirmer.</p>
+      <p>
+        Merci&nbsp;! Votre commande <strong>{{ cmd.numero }}</strong> a bien été enregistrée. Nous
+        vous contacterons au <strong>{{ cmd.client_telephone }}</strong> pour la confirmer.
+      </p>
+      @if (
+        cmd.moyen_paiement === 'wave' ||
+        cmd.moyen_paiement === 'orange_money' ||
+        cmd.moyen_paiement === 'free_money'
+      ) {
+        <div class="paiement-rappel">
+          <p>
+            Pour finaliser, envoyez <strong>{{ cmd.montant_total | fcfa }}</strong> via mobile money
+            à l'un de ces numéros, en précisant votre commande <strong>{{ cmd.numero }}</strong
+            >&nbsp;:
+          </p>
+          <ul class="pm-numeros">
+            <li>77 471 52 57</li>
+            <li>78 481 98 09</li>
+          </ul>
+        </div>
+      }
       <a routerLink="/catalogue" class="btn accent">Continuer mes achats</a>
     </div>
   } @else {
@@ -24,19 +44,31 @@
 
           <div class="champ">
             <label>Nom *</label>
-            <input type="text" formControlName="client_nom" [class.invalide]="estInvalide('client_nom')">
-            @if (estInvalide('client_nom')) { <small>Le nom est obligatoire.</small> }
+            <input
+              type="text"
+              formControlName="client_nom"
+              [class.invalide]="estInvalide('client_nom')"
+            />
+            @if (estInvalide('client_nom')) {
+              <small>Le nom est obligatoire.</small>
+            }
           </div>
 
           <div class="champ">
             <label>Prénom</label>
-            <input type="text" formControlName="client_prenom">
+            <input type="text" formControlName="client_prenom" />
           </div>
 
           <div class="champ">
             <label>Téléphone *</label>
-            <input type="tel" formControlName="client_telephone" [class.invalide]="estInvalide('client_telephone')">
-            @if (estInvalide('client_telephone')) { <small>Le téléphone est obligatoire.</small> }
+            <input
+              type="tel"
+              formControlName="client_telephone"
+              [class.invalide]="estInvalide('client_telephone')"
+            />
+            @if (estInvalide('client_telephone')) {
+              <small>Le téléphone est obligatoire.</small>
+            }
           </div>
 
           <div class="champ">
@@ -47,13 +79,37 @@
               }
             </select>
           </div>
+          @if (paiementMobile()) {
+            <div class="paiement-mobile">
+              <p class="pm-titre">Comment payer</p>
+              <p>
+                Envoyez le montant (<strong>{{ total() | fcfa }}</strong
+                >) via mobile money à l'un de ces numéros&nbsp;:
+              </p>
+              <ul class="pm-numeros">
+                @for (n of NUMEROS_VENDEUR; track n) {
+                  <li>{{ n }}</li>
+                }
+              </ul>
+              <p class="pm-note">
+                Indiquez votre nom lors de l'envoi. Votre commande est confirmée dès réception du
+                paiement.
+              </p>
+            </div>
+          }
 
           <div class="champ">
             <label>Note (facultatif)</label>
-            <textarea formControlName="notes" rows="3" placeholder="Précision de livraison, taille, etc."></textarea>
+            <textarea
+              formControlName="notes"
+              rows="3"
+              placeholder="Précision de livraison, taille, etc."
+            ></textarea>
           </div>
 
-          @if (erreur()) { <p class="erreur">{{ erreur() }}</p> }
+          @if (erreur()) {
+            <p class="erreur">{{ erreur() }}</p>
+          }
 
           <button type="submit" class="btn accent bloc" [disabled]="envoi()">
             {{ envoi() ? 'Envoi…' : 'Confirmer la commande' }}
@@ -65,11 +121,18 @@
           @for (l of lignes(); track l.variante_id) {
             <div class="art">
               <span class="q">{{ l.quantite }}×</span>
-              <span class="n">{{ l.produit_nom }}@if (libelle(l)) { <em>{{ libelle(l) }}</em> }</span>
-              <span class="p">{{ (l.prix_unitaire * l.quantite) | fcfa }}</span>
+              <span class="n"
+                >{{ l.produit_nom }}
+                @if (libelle(l)) {
+                  <em>{{ libelle(l) }}</em>
+                }
+              </span>
+              <span class="p">{{ l.prix_unitaire * l.quantite | fcfa }}</span>
             </div>
           }
-          <div class="ligne-recap total"><span>Total</span><span>{{ total() | fcfa }}</span></div>
+          <div class="ligne-recap total">
+            <span>Total</span><span>{{ total() | fcfa }}</span>
+          </div>
         </aside>
       </div>
     }

@@ -22,7 +22,12 @@ export const routesBoutique: Routes = [
       { path: 'catalogue', component: Catalogue, title: 'Catalogue — Pape Alé et Bamba' },
       { path: 'produit/:id', component: ProduitDetail, title: 'Produit — Pape Alé et Bamba' },
       { path: 'panier', component: Panier, title: 'Mon panier — Pape Alé et Bamba' },
-      { path: 'commande', component: Commande, title: 'Ma commande — Pape Alé et Bamba' },
+      {
+        path: 'commande',
+        component: Commande,
+        canActivate: [clientGarde],
+        title: 'Ma commande — Pape Ale et Bamba',
+      },
       { path: 'inscription', component: Inscription, title: 'Créer un compte — Pape Alé et Bamba' },
       { path: 'connexion', component: ConnexionClient, title: 'Connexion — Pape Alé et Bamba' },
       {

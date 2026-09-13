@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, HostListener, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { catchError, of, switchMap, tap } from 'rxjs';
@@ -30,14 +30,41 @@ export class ProduitDetail {
   );
 
   readonly varianteSelectionnee = signal<Variante | null>(null);
-  readonly photoActive = signal<string | null>(null);
+  readonly indexPhoto = signal(0);
   readonly message = signal<string | null>(null);
 
-  readonly variantesActives = computed(() => (this.produit()?.variantes ?? []).filter((v) => v.actif));
+  readonly photos = computed(() => this.produit()?.photos ?? []);
+  readonly photoActive = computed(() => this.photos()[this.indexPhoto()]?.url ?? null);
+
+  readonly variantesActives = computed(() =>
+    (this.produit()?.variantes ?? []).filter((v) => v.actif),
+  );
   readonly peutAjouter = computed(() => {
     const variante = this.varianteSelectionnee();
     return !!variante && variante.quantite_disponible > 0;
   });
+
+  precedente(): void {
+    const n = this.photos().length;
+    if (n > 1) this.indexPhoto.update((i) => (i - 1 + n) % n);
+  }
+
+  suivante(): void {
+    const n = this.photos().length;
+    if (n > 1) this.indexPhoto.update((i) => (i + 1) % n);
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  clavier(evenement: KeyboardEvent): void {
+    const cible = evenement.target as HTMLElement | null;
+    if (cible && ['INPUT', 'TEXTAREA', 'SELECT'].includes(cible.tagName)) return;
+    if (this.photos().length < 2) return;
+    if (evenement.key === 'ArrowLeft') {
+      this.precedente();
+    } else if (evenement.key === 'ArrowRight') {
+      this.suivante();
+    }
+  }
 
   libelleVariante(variante: Variante): string {
     const parties = [variante.couleur, variante.taille].filter(Boolean);
@@ -70,10 +97,10 @@ export class ProduitDetail {
     this.varianteSelectionnee.set(null);
     this.message.set(null);
     if (produit && produit.photos.length) {
-      const principale = produit.photos.find((p) => p.est_principale) ?? produit.photos[0];
-      this.photoActive.set(principale.url);
+      const idx = produit.photos.findIndex((p) => p.est_principale);
+      this.indexPhoto.set(idx >= 0 ? idx : 0);
     } else {
-      this.photoActive.set(null);
+      this.indexPhoto.set(0);
     }
   }
 }

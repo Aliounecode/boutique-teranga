@@ -171,3 +171,45 @@
     gap: 32px;
   }
 }
+/* Navigation de la galerie */
+.galerie .principale {
+  position: relative;
+}
+.galerie .principale .fleche {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(43, 35, 32, 0.5);
+  color: #fff;
+  font-size: 1.7rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.galerie .principale .fleche:hover {
+  background: rgba(43, 35, 32, 0.85);
+}
+.galerie .principale .fleche.gauche {
+  left: 12px;
+}
+.galerie .principale .fleche.droite {
+  right: 12px;
+}
+.galerie .principale .compteur {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  background: rgba(43, 35, 32, 0.6);
+  color: #fff;
+  font-size: 0.72rem;
+  padding: 4px 10px;
+  border-radius: 20px;
+  letter-spacing: 0.05em;
+}

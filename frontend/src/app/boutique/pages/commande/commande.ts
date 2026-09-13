@@ -1,4 +1,5 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
@@ -43,6 +44,13 @@ export class Commande {
     moyen_paiement: ['wave' as MoyenPaiement, Validators.required],
     notes: [''],
   });
+  readonly NUMEROS_VENDEUR = ['77 471 52 57', '78 481 98 09'];
+  readonly moyenChoisi = toSignal(this.formulaire.controls.moyen_paiement.valueChanges, {
+    initialValue: this.formulaire.controls.moyen_paiement.value,
+  });
+  readonly paiementMobile = computed(() =>
+    ['wave', 'orange_money', 'free_money'].includes(this.moyenChoisi()),
+  );
   constructor() {
     if (this.authClient.estConnecte()) {
       if (this.authClient.client()) {
