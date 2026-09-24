@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '../../coeur/services/auth';
 
@@ -10,21 +10,25 @@ import { AuthService } from '../../coeur/services/auth';
       <aside class="cote">
         <a routerLink="/gestion" class="marque">PAPE ALE ET BAMBA <span>Gestion</span></a>
         <nav>
-          @for (item of menu; track item.lien) {
+          @for (item of menu(); track item.lien) {
             <a
               [routerLink]="item.lien"
               routerLinkActive="actif"
               [routerLinkActiveOptions]="{ exact: item.exact }"
+              >{{ item.libelle }}</a
             >
-              {{ item.libelle }}
-            </a>
           }
         </nav>
       </aside>
       <div class="principal">
         <header class="haut">
           @if (utilisateur(); as u) {
-            <span class="user">{{ u.prenom }} {{ u.nom }}</span>
+            <span class="user"
+              >{{ u.prenom }} {{ u.nom }}
+              <span class="role" [class.vendeur]="!estGerant()">{{
+                estGerant() ? 'Gérant' : 'Vendeur'
+              }}</span></span
+            >
           }
           <button class="deco" (click)="deconnexion()">Déconnexion</button>
         </header>
@@ -101,6 +105,22 @@ import { AuthService } from '../../coeur/services/auth';
       .user {
         font-size: 0.9rem;
         color: var(--texte);
+        display: inline-flex;
+        align-items: center;
+      }
+      .role {
+        margin-left: 8px;
+        font-size: 0.6rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        padding: 3px 9px;
+        border-radius: 20px;
+        background: rgba(183, 110, 91, 0.16);
+        color: var(--accent);
+      }
+      .role.vendeur {
+        background: #eef0f6;
+        color: #4a5578;
       }
       .deco {
         background: none;
@@ -152,17 +172,22 @@ export class GestionLayout {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
   readonly utilisateur = this.auth.utilisateur;
+  readonly estGerant = this.auth.estGerant;
 
-  readonly menu = [
-    { lien: '/gestion', libelle: 'Tableau de bord', exact: true },
-    { lien: '/gestion/produits', libelle: 'Produits', exact: false },
-    { lien: '/gestion/stock', libelle: 'Stock', exact: false },
-    { lien: '/gestion/caisse', libelle: 'Caisse', exact: false },
-    { lien: '/gestion/commandes', libelle: 'Commandes', exact: false },
-    { lien: '/gestion/clients', libelle: 'Clients', exact: false },
-    { lien: '/gestion/rapports', libelle: 'Rapports', exact: false },
-    { lien: '/gestion/equipe', libelle: 'Équipe', exact: false },
+  private readonly tousLesLiens = [
+    { lien: '/gestion', libelle: 'Tableau de bord', exact: true, vendeur: false },
+    { lien: '/gestion/produits', libelle: 'Produits', exact: false, vendeur: false },
+    { lien: '/gestion/stock', libelle: 'Stock', exact: false, vendeur: false },
+    { lien: '/gestion/caisse', libelle: 'Caisse', exact: false, vendeur: true },
+    { lien: '/gestion/commandes', libelle: 'Commandes', exact: false, vendeur: false },
+    { lien: '/gestion/clients', libelle: 'Clients', exact: false, vendeur: true },
+    { lien: '/gestion/rapports', libelle: 'Rapports', exact: false, vendeur: false },
+    { lien: '/gestion/equipe', libelle: 'Équipe', exact: false, vendeur: false },
   ];
+
+  readonly menu = computed(() =>
+    this.auth.estGerant() ? this.tousLesLiens : this.tousLesLiens.filter((i) => i.vendeur),
+  );
 
   deconnexion(): void {
     this.auth.deconnexion();

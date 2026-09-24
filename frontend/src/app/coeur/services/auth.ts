@@ -15,6 +15,7 @@ export class AuthService {
 
   readonly estConnecte = computed(() => this.jeton() !== null);
   readonly estGerant = computed(() => this.utilisateur()?.role.nom === 'gerant');
+  readonly estVendeur = computed(() => this.utilisateur()?.role.nom === 'vendeur');
 
   /** Connexion OAuth2 (form-urlencoded), puis chargement du profil. */
   connexion(nomUtilisateur: string, motDePasse: string): Observable<Utilisateur> {
