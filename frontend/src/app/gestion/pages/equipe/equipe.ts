@@ -125,9 +125,13 @@ import { Role, Utilisateur } from '../../../coeur/modeles/modeles';
                   }
                 </td>
                 <td>
-                  <select class="role-select" [value]="u.role.id" (change)="changerRole(u, $event)">
+                  <select
+                    class="role-select"
+                    [value]="u.role.id.toString()"
+                    (change)="changerRole(u, $event)"
+                  >
                     @for (r of roles(); track r.id) {
-                      <option [value]="r.id">{{ libelleRole(r.nom) }}</option>
+                      <option [value]="r.id.toString()">{{ libelleRole(r.nom) }}</option>
                     }
                   </select>
                 </td>
@@ -507,7 +511,7 @@ export class Equipe {
 
   changerRole(u: Utilisateur, evenement: Event): void {
     const role_id = Number((evenement.target as HTMLSelectElement).value);
-    if (role_id === u.role.id) return;
+    if (!role_id || role_id === u.role.id) return;
     this.majSimple(u.id, { role_id }, 'Rôle mis à jour.');
   }
 
