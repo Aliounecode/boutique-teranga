@@ -1,59 +1,148 @@
 <div class="rap-tete">
   <div>
     <span class="surtitre">Bilan</span>
-    <h1>Rapport de la journée</h1>
+    <h1>{{ estGerant() ? 'Rapport de la journée' : 'Mes ventes' }}</h1>
   </div>
   <div class="rap-controls">
-    <input type="date" [value]="jour()" (change)="choisirJour($any($event.target).value)">
-    <button class="btn accent" [disabled]="telechargement()" (click)="telecharger()">
-      {{ telechargement() ? 'Préparation…' : 'Télécharger le PDF' }}
+    <input type="date" [value]="jour()" (change)="choisirJour($any($event.target).value)" />
+    @if (estGerant()) {
+      <button class="btn accent" [disabled]="telechargement()" (click)="telecharger()">
+        {{ telechargement() ? 'Préparation…' : 'Rapport boutique (PDF)' }}
+      </button>
+    }
+    <button class="btn accent" [disabled]="telechargementMes()" (click)="telechargerMesVentes()">
+      {{ telechargementMes() ? 'Préparation…' : 'Mes ventes (PDF)' }}
     </button>
   </div>
 </div>
 
-@if (erreur()) { <p class="erreur-b">{{ erreur() }}</p> }
+@if (erreur()) {
+  <p class="erreur-b">{{ erreur() }}</p>
+}
 
-@if (rapport(); as r) {
+<!-- Mes ventes : visible par tout le personnel -->
+@if (mesVentes(); as m) {
   <div class="rap-grille">
     <section class="carte-r">
-      <h2>Ventes</h2>
+      <h2>Mes ventes du jour</h2>
       <ul class="lignes-r">
-        <li><span>Ventes physiques</span><span>{{ r.ventes.physiques_nombre }} · {{ r.ventes.physiques_montant | fcfa }}</span></li>
-        <li><span>Ventes en ligne</span><span>{{ r.ventes.en_ligne_nombre }} · {{ r.ventes.en_ligne_montant | fcfa }}</span></li>
-        <li><span>Nombre total de ventes</span><span>{{ r.ventes.nombre_total }}</span></li>
-        <li class="fort"><span>Chiffre d'affaires</span><span>{{ r.ventes.chiffre_affaires | fcfa }}</span></li>
+        <li>
+          <span>Nombre de ventes</span><span>{{ m.nombre_ventes }}</span>
+        </li>
+        <li>
+          <span>Articles vendus</span><span>{{ m.articles_vendus }}</span>
+        </li>
+        <li class="fort">
+          <span>Total encaissé</span><span>{{ m.total_encaisse | fcfa }}</span>
+        </li>
       </ul>
     </section>
 
-    <section class="carte-r">
-      <h2>Encaissements par moyen</h2>
-      <ul class="lignes-r">
-        @for (p of r.paiements; track p.moyen) {
-          <li><span>{{ libelleMoyen(p.moyen) }}</span><span>{{ p.montant | fcfa }}</span></li>
-        }
-      </ul>
-    </section>
+    @if (m.paiements.length) {
+      <section class="carte-r">
+        <h2>Mes encaissements par moyen</h2>
+        <ul class="lignes-r">
+          @for (p of m.paiements; track p.moyen) {
+            <li>
+              <span>{{ libelleMoyen(p.moyen) }}</span
+              ><span>{{ p.montant | fcfa }}</span>
+            </li>
+          }
+        </ul>
+      </section>
+    }
 
-    <section class="carte-r">
-      <h2>Commandes en ligne</h2>
-      <ul class="lignes-r">
-        <li><span>Reçues</span><span>{{ r.commandes.recues }}</span></li>
-        <li><span>Validées</span><span>{{ r.commandes.validees }}</span></li>
-        <li><span>Refusées</span><span>{{ r.commandes.refusees }}</span></li>
-        <li><span>Annulées</span><span>{{ r.commandes.annulees }}</span></li>
-      </ul>
-    </section>
-
-    <section class="carte-r">
-      <h2>Stock</h2>
-      <ul class="lignes-r">
-        <li><span>Articles vendus</span><span>{{ r.stock.articles_vendus }}</span></li>
-        <li><span>Réapprovisionnés</span><span>{{ r.stock.reapprovisionnes }}</span></li>
-        <li><span>Variantes en rupture</span><span>{{ r.stock.en_rupture }}</span></li>
-        <li><span>Proches de la rupture</span><span>{{ r.stock.proches_rupture }}</span></li>
-      </ul>
+    <section class="carte-r pleine">
+      <h2>Détail de mes ventes</h2>
+      @if (m.ventes.length) {
+        <ul class="lignes-r">
+          @for (v of m.ventes; track v.numero) {
+            <li>
+              <span>{{ v.heure }} · {{ v.numero }} · {{ v.client }}</span
+              ><span>{{ v.montant | fcfa }}</span>
+            </li>
+          }
+        </ul>
+      } @else {
+        <p class="chargement">Aucune vente enregistrée sur cette journée.</p>
+      }
     </section>
   </div>
-} @else {
-  <p class="chargement">Chargement…</p>
+}
+
+<!-- Rapport global de la boutique : gérant uniquement -->
+@if (estGerant()) {
+  @if (rapport(); as r) {
+    <div class="rap-grille">
+      <section class="carte-r">
+        <h2>Ventes</h2>
+        <ul class="lignes-r">
+          <li>
+            <span>Ventes physiques</span
+            ><span>{{ r.ventes.physiques_nombre }} · {{ r.ventes.physiques_montant | fcfa }}</span>
+          </li>
+          <li>
+            <span>Ventes en ligne</span
+            ><span>{{ r.ventes.en_ligne_nombre }} · {{ r.ventes.en_ligne_montant | fcfa }}</span>
+          </li>
+          <li>
+            <span>Nombre total de ventes</span><span>{{ r.ventes.nombre_total }}</span>
+          </li>
+          <li class="fort">
+            <span>Chiffre d'affaires</span><span>{{ r.ventes.chiffre_affaires | fcfa }}</span>
+          </li>
+        </ul>
+      </section>
+
+      <section class="carte-r">
+        <h2>Encaissements par moyen</h2>
+        <ul class="lignes-r">
+          @for (p of r.paiements; track p.moyen) {
+            <li>
+              <span>{{ libelleMoyen(p.moyen) }}</span
+              ><span>{{ p.montant | fcfa }}</span>
+            </li>
+          }
+        </ul>
+      </section>
+
+      <section class="carte-r">
+        <h2>Commandes en ligne</h2>
+        <ul class="lignes-r">
+          <li>
+            <span>Reçues</span><span>{{ r.commandes.recues }}</span>
+          </li>
+          <li>
+            <span>Validées</span><span>{{ r.commandes.validees }}</span>
+          </li>
+          <li>
+            <span>Refusées</span><span>{{ r.commandes.refusees }}</span>
+          </li>
+          <li>
+            <span>Annulées</span><span>{{ r.commandes.annulees }}</span>
+          </li>
+        </ul>
+      </section>
+
+      <section class="carte-r">
+        <h2>Stock</h2>
+        <ul class="lignes-r">
+          <li>
+            <span>Articles vendus</span><span>{{ r.stock.articles_vendus }}</span>
+          </li>
+          <li>
+            <span>Réapprovisionnés</span><span>{{ r.stock.reapprovisionnes }}</span>
+          </li>
+          <li>
+            <span>Variantes en rupture</span><span>{{ r.stock.en_rupture }}</span>
+          </li>
+          <li>
+            <span>Proches de la rupture</span><span>{{ r.stock.proches_rupture }}</span>
+          </li>
+        </ul>
+      </section>
+    </div>
+  } @else {
+    <p class="chargement">Chargement…</p>
+  }
 }

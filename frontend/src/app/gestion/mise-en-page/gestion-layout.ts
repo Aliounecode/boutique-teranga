@@ -181,7 +181,7 @@ export class GestionLayout {
     { lien: '/gestion/caisse', libelle: 'Caisse', exact: false, vendeur: true },
     { lien: '/gestion/commandes', libelle: 'Commandes', exact: false, vendeur: false },
     { lien: '/gestion/clients', libelle: 'Clients', exact: false, vendeur: true },
-    { lien: '/gestion/rapports', libelle: 'Rapports', exact: false, vendeur: false },
+    { lien: '/gestion/rapports', libelle: 'Rapports', exact: false, vendeur: true },
     { lien: '/gestion/equipe', libelle: 'Équipe', exact: false, vendeur: false },
   ];
 

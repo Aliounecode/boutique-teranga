@@ -488,3 +488,24 @@ export interface UtilisateurMiseAJour {
   role_id?: number;
   actif?: boolean;
 }
+// ----- Rapport « mes ventes » (vendeur / gérant) -----
+export interface MesVentesLigne {
+  numero: string;
+  heure: string;
+  client: string;
+  montant: string;
+}
+
+export interface MesVentesPaiement {
+  moyen: MoyenPaiement;
+  montant: string;
+}
+
+export interface MesVentes {
+  date: string;
+  nombre_ventes: number;
+  total_encaisse: string;
+  articles_vendus: number;
+  ventes: MesVentesLigne[];
+  paiements: MesVentesPaiement[];
+}

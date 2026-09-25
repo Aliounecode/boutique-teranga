@@ -64,7 +64,7 @@ export const routesGestion: Routes = [
       {
         path: 'rapports',
         component: Rapports,
-        canActivate: [gardeGerant],
+
         title: 'Rapports — Gestion',
       },
       { path: 'equipe', component: Equipe, canActivate: [gardeGerant], title: 'Équipe — Gestion' },

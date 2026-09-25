@@ -164,3 +164,135 @@ def generer_pdf_rapport(donnees: dict, nom_boutique: str, adresse: str | None = 
 
     doc.build(story)
     return tampon.getvalue()
+
+# --- Rapport « mes ventes » (vendeur) ---------------------------------------
+def donnees_mes_ventes(session, utilisateur_id: int, jour: date | None = None) -> dict:
+    """Ventes realisees par UN utilisateur sur une journee (aucun chiffre global)."""
+    from app.modeles import Client, LigneVente, Paiement, Vente
+    from app.modeles.enumerations import StatutVente
+
+    jour = jour or date.today()
+    debut = datetime.combine(jour, time.min)
+    fin = datetime.combine(jour + timedelta(days=1), time.min)
+
+    conditions = (
+        Vente.utilisateur_id == utilisateur_id,
+        Vente.statut == StatutVente.VALIDEE,
+        Vente.date_vente >= debut,
+        Vente.date_vente < fin,
+    )
+
+    lignes_ventes = session.execute(
+        select(Vente, Client)
+        .join(Client, Vente.client_id == Client.id, isouter=True)
+        .where(*conditions)
+        .order_by(Vente.date_vente.asc())
+    ).all()
+
+    ventes = []
+    total = Decimal("0")
+    for vente, client in lignes_ventes:
+        nom_client = "Client de passage"
+        if client is not None:
+            nom_client = f"{client.prenom or ''} {client.nom}".strip()
+        ventes.append({
+            "numero": vente.numero,
+            "heure": vente.date_vente.strftime("%H:%M"),
+            "client": nom_client,
+            "montant": vente.montant_total,
+        })
+        total += vente.montant_total
+
+    articles = session.scalar(
+        select(func.coalesce(func.sum(LigneVente.quantite), 0))
+        .select_from(LigneVente)
+        .join(Vente, LigneVente.vente_id == Vente.id)
+        .where(*conditions)
+    ) or 0
+
+    lignes_paiements = session.execute(
+        select(Paiement.moyen, func.coalesce(func.sum(Paiement.montant), 0))
+        .select_from(Paiement)
+        .join(Vente, Paiement.vente_id == Vente.id)
+        .where(*conditions)
+        .group_by(Paiement.moyen)
+    ).all()
+    presents = {moyen: montant for moyen, montant in lignes_paiements}
+    paiements = [
+        {"moyen": moyen, "montant": presents.get(moyen, Decimal("0"))}
+        for moyen in MoyenPaiement
+        if presents.get(moyen)
+    ]
+
+    return {
+        "date": jour,
+        "nombre_ventes": len(ventes),
+        "total_encaisse": total,
+        "articles_vendus": int(articles),
+        "ventes": ventes,
+        "paiements": paiements,
+    }
+
+
+def generer_pdf_mes_ventes(
+    donnees: dict, nom_vendeur: str, nom_boutique: str,
+    adresse: str | None = None, telephone: str | None = None,
+) -> bytes:
+    tampon = io.BytesIO()
+    doc = SimpleDocTemplate(
+        tampon, pagesize=A4,
+        topMargin=2 * cm, bottomMargin=2 * cm, leftMargin=2 * cm, rightMargin=2 * cm,
+        title=f"Mes ventes du {donnees['date'].isoformat()}",
+    )
+    styles = getSampleStyleSheet()
+    story: list = []
+
+    story.append(Paragraph(nom_boutique, styles["Title"]))
+    coordonnees = " · ".join(x for x in (adresse, telephone) if x)
+    if coordonnees:
+        story.append(Paragraph(coordonnees, styles["Normal"]))
+    story.append(Spacer(1, 6))
+    story.append(Paragraph(
+        f"Mes ventes — {donnees['date'].strftime('%d/%m/%Y')}", styles["Heading2"]
+    ))
+    story.append(Paragraph(f"Vendeur : {nom_vendeur}", styles["Normal"]))
+    story.append(Spacer(1, 12))
+
+    story += _section("Récapitulatif", [
+        ("Nombre de ventes", str(donnees["nombre_ventes"])),
+        ("Articles vendus", str(donnees["articles_vendus"])),
+        ("Total encaissé", formater_fcfa(donnees["total_encaisse"])),
+    ], styles)
+
+    if donnees["paiements"]:
+        story += _section("Encaissements par moyen de paiement", [
+            (LIBELLES_MOYEN[p["moyen"]], formater_fcfa(p["montant"])) for p in donnees["paiements"]
+        ], styles)
+
+    story.append(Paragraph("Détail des ventes", styles["Heading3"]))
+    if donnees["ventes"]:
+        corps = [["N° vente", "Heure", "Client", "Montant"]]
+        for v in donnees["ventes"]:
+            corps.append([v["numero"], v["heure"], v["client"], formater_fcfa(v["montant"])])
+        table = Table(corps, colWidths=[4 * cm, 2 * cm, 7 * cm, 4 * cm])
+        table.setStyle(TableStyle([
+            ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#cccccc")),
+            ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#f5f5f5")),
+            ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+            ("ALIGN", (3, 1), (3, -1), "RIGHT"),
+            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+            ("TOPPADDING", (0, 0), (-1, -1), 5),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
+            ("LEFTPADDING", (0, 0), (-1, -1), 8),
+        ]))
+        story.append(table)
+    else:
+        story.append(Paragraph("Aucune vente enregistrée sur cette journée.", styles["Normal"]))
+
+    story.append(Spacer(1, 18))
+    story.append(Paragraph(
+        f"Document généré le {datetime.now().strftime('%d/%m/%Y à %H:%M')}", styles["Italic"]
+    ))
+
+    doc.build(story)
+    return tampon.getvalue()
