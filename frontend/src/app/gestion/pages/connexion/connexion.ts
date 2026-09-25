@@ -39,10 +39,12 @@ export class Connexion {
       next: () => {
         this.envoi.set(false);
         if (this.auth.estGerant()) {
-          this.router.navigate(['/gestion']);
+          this.router.navigate(['/gestion']); // gérant → tableau de bord
+        } else if (this.auth.estVendeur()) {
+          this.router.navigate(['/gestion/caisse']); // vendeur → caisse
         } else {
           this.auth.deconnexion();
-          this.erreur.set("Ce compte n'a pas accès à l'espace gérant.");
+          this.erreur.set("Ce compte n'a pas accès à l'espace de gestion.");
         }
       },
       error: () => {
