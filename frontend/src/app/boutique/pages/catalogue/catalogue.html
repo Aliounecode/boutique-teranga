@@ -1,24 +1,31 @@
-<div class="conteneur cat-entete">
+<div class="conteneur cat-entete" apparition>
   <span class="surtitre">Boutique</span>
   <h1 class="titre-section">Le catalogue</h1>
 </div>
 
 <div class="conteneur cat-corps">
-  <aside class="filtres">
+  <aside class="filtres" apparition>
     <div class="groupe">
       <label>Recherche</label>
-      <input #q type="search" placeholder="Nom du produit…" (change)="definirRecherche(q.value)">
+      <input #q type="search" placeholder="Nom du produit…" (change)="definirRecherche(q.value)" />
     </div>
 
     <div class="groupe">
       <label>Catégories</label>
       <ul class="liste-cat">
         <li>
-          <button [class.actif]="!filtres().categorie_id" (click)="definirCategorie(undefined)">Toutes</button>
+          <button [class.actif]="!filtres().categorie_id" (click)="definirCategorie(undefined)">
+            Toutes
+          </button>
         </li>
         @for (c of categoriesPlates(); track c.id) {
           <li [style.padding-left.px]="c.niveau * 14">
-            <button [class.actif]="filtres().categorie_id === c.id" (click)="definirCategorie(c.id)">{{ c.nom }}</button>
+            <button
+              [class.actif]="filtres().categorie_id === c.id"
+              (click)="definirCategorie(c.id)"
+            >
+              {{ c.nom }}
+            </button>
           </li>
         }
       </ul>
@@ -27,15 +34,33 @@
     <div class="groupe">
       <label>Prix (FCFA)</label>
       <div class="prix-plage">
-        <input #pmin type="number" min="0" placeholder="Min" (change)="definirPrixMin(pmin.value)">
+        <input
+          #pmin
+          type="number"
+          min="0"
+          placeholder="Min"
+          (change)="definirPrixMin(pmin.value)"
+        />
         <span>—</span>
-        <input #pmax type="number" min="0" placeholder="Max" (change)="definirPrixMax(pmax.value)">
+        <input
+          #pmax
+          type="number"
+          min="0"
+          placeholder="Max"
+          (change)="definirPrixMax(pmax.value)"
+        />
       </div>
     </div>
 
     <div class="groupe">
-      <label class="case"><input type="checkbox" [checked]="!!filtres().en_promotion" (change)="basculerPromo()"> En promotion</label>
-      <label class="case"><input type="checkbox" [checked]="!!filtres().en_stock" (change)="basculerStock()"> En stock uniquement</label>
+      <label class="case"
+        ><input type="checkbox" [checked]="!!filtres().en_promotion" (change)="basculerPromo()" />
+        En promotion</label
+      >
+      <label class="case"
+        ><input type="checkbox" [checked]="!!filtres().en_stock" (change)="basculerStock()" /> En
+        stock uniquement</label
+      >
     </div>
 
     <button class="reinit" (click)="reinitialiser()">Réinitialiser</button>
@@ -44,7 +69,11 @@
   <div class="resultats">
     <div class="barre-tri">
       <span class="compte">
-        @if (page()) { {{ page()!.total }} produit(s) } @else { … }
+        @if (page()) {
+          {{ page()!.total }} produit(s)
+        } @else {
+          …
+        }
       </span>
       <label class="tri">
         Trier :
@@ -58,21 +87,33 @@
     </div>
 
     @if (chargement() && !page()) {
-      <p class="etat">Chargement…</p>
+      <div class="grille">
+        @for (s of squelettes; track $index) {
+          <div class="carte-fantome">
+            <div class="squelette squelette-image"></div>
+            <div class="squelette squelette-texte moyen"></div>
+            <div class="squelette squelette-texte court"></div>
+          </div>
+        }
+      </div>
     } @else if (page() && page()!.total === 0) {
       <p class="etat">Aucun produit ne correspond à votre recherche.</p>
     } @else {
       <div class="grille" [class.attenue]="chargement()">
-        @for (p of page()?.elements ?? []; track p.id) {
-          <bq-carte-produit [produit]="p" />
+        @for (p of page()?.elements ?? []; track p.id; let i = $index) {
+          <bq-carte-produit apparition [delai]="i * 60" [produit]="p" />
         }
       </div>
 
       @if (nombrePages() > 1) {
         <div class="pagination">
-          <button [disabled]="page()!.page <= 1" (click)="allerPage(page()!.page - 1)">← Précédent</button>
+          <button [disabled]="page()!.page <= 1" (click)="allerPage(page()!.page - 1)">
+            ← Précédent
+          </button>
           <span>Page {{ page()!.page }} / {{ nombrePages() }}</span>
-          <button [disabled]="page()!.page >= nombrePages()" (click)="allerPage(page()!.page + 1)">Suivant →</button>
+          <button [disabled]="page()!.page >= nombrePages()" (click)="allerPage(page()!.page + 1)">
+            Suivant →
+          </button>
         </div>
       }
     }

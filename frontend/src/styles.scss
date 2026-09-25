@@ -2,26 +2,32 @@
    DESIGN SYSTEM GLOBAL — direction élégante · féminine · premium
    ======================================================================= */
 :root {
-  --fond:        #FAF6F1;
-  --surface:     #FFFFFF;
-  --surface-2:   #F3EBE1;
-  --texte:       #2B2320;
-  --texte-doux:  #6E6058;
-  --accent:      #B76E5B;
-  --accent-fonce:#9A5645;
-  --or:          #C29A54;
-  --bordure:     #E7DDD1;
+  --fond: #faf6f1;
+  --surface: #ffffff;
+  --surface-2: #f3ebe1;
+  --texte: #2b2320;
+  --texte-doux: #6e6058;
+  --accent: #b76e5b;
+  --accent-fonce: #9a5645;
+  --or: #c29a54;
+  --bordure: #e7ddd1;
 
   --serif: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
-  --sans:  'Jost', 'Segoe UI', system-ui, sans-serif;
+  --sans: 'Jost', 'Segoe UI', system-ui, sans-serif;
 
   --large: 1180px;
   --ombre: 0 18px 50px rgba(43, 35, 32, 0.08);
   --transi: 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
-html { scroll-behavior: smooth; }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+html {
+  scroll-behavior: smooth;
+}
 body {
   font-family: var(--sans);
   color: var(--texte);
@@ -30,32 +36,223 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
 }
-img { max-width: 100%; display: block; }
-a { color: inherit; text-decoration: none; }
+img {
+  max-width: 100%;
+  display: block;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
 
-.conteneur { width: 100%; max-width: var(--large); margin: 0 auto; padding: 0 28px; }
+.conteneur {
+  width: 100%;
+  max-width: var(--large);
+  margin: 0 auto;
+  padding: 0 28px;
+}
 
 .surtitre {
-  font-size: 0.72rem; font-weight: 500;
-  letter-spacing: 0.28em; text-transform: uppercase; color: var(--accent);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--accent);
 }
 .titre-section {
-  font-family: var(--serif); font-weight: 500;
-  font-size: clamp(2rem, 4vw, 2.9rem); line-height: 1.1; letter-spacing: 0.01em;
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: clamp(2rem, 4vw, 2.9rem);
+  line-height: 1.1;
+  letter-spacing: 0.01em;
 }
-.filet { width: 46px; height: 1px; background: var(--or); border: none; margin: 18px 0 0; }
-.filet.centre { margin: 18px auto 0; }
+.filet {
+  width: 46px;
+  height: 1px;
+  background: var(--or);
+  border: none;
+  margin: 18px 0 0;
+}
+.filet.centre {
+  margin: 18px auto 0;
+}
 
 .btn {
-  display: inline-flex; align-items: center; gap: 10px;
-  font-family: var(--sans); font-size: 0.78rem; font-weight: 500;
-  letter-spacing: 0.18em; text-transform: uppercase;
-  padding: 15px 30px; border: 1px solid var(--texte);
-  background: var(--texte); color: var(--fond);
-  cursor: pointer; transition: all var(--transi);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--sans);
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 15px 30px;
+  border: 1px solid var(--texte);
+  background: var(--texte);
+  color: var(--fond);
+  cursor: pointer;
+  transition: all var(--transi);
 }
-.btn:hover { background: transparent; color: var(--texte); }
-.btn.clair { background: transparent; color: var(--texte); }
-.btn.clair:hover { background: var(--texte); color: var(--fond); }
-.btn.accent { background: var(--accent); border-color: var(--accent); color: #fff; }
-.btn.accent:hover { background: var(--accent-fonce); border-color: var(--accent-fonce); }
+.btn:hover {
+  background: transparent;
+  color: var(--texte);
+}
+.btn.clair {
+  background: transparent;
+  color: var(--texte);
+}
+.btn.clair:hover {
+  background: var(--texte);
+  color: var(--fond);
+}
+.btn.accent {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.btn.accent:hover {
+  background: var(--accent-fonce);
+  border-color: var(--accent-fonce);
+}
+/* ============================================================
+   Animations — apparitions, transitions, skeletons
+   ============================================================ */
+
+/* --- Apparition au scroll (directive [apparition]) --- */
+.app-apparition {
+  opacity: 0;
+  transform: translateY(22px);
+  transition:
+    opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+.app-apparition.est-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* --- Entrée de page (transition de route) --- */
+@keyframes entree-page {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.page-entree {
+  animation: entree-page 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* --- Skeletons de chargement --- */
+@keyframes chatoiement {
+  0% {
+    background-position: -420px 0;
+  }
+  100% {
+    background-position: 420px 0;
+  }
+}
+.squelette {
+  background: linear-gradient(
+    90deg,
+    var(--surface-2, #efe8e0) 25%,
+    rgba(255, 255, 255, 0.65) 50%,
+    var(--surface-2, #efe8e0) 75%
+  );
+  background-size: 840px 100%;
+  animation: chatoiement 1.4s ease-in-out infinite;
+  border-radius: 3px;
+}
+.squelette-texte {
+  height: 12px;
+  margin-bottom: 9px;
+}
+.squelette-texte.court {
+  width: 45%;
+}
+.squelette-texte.moyen {
+  width: 70%;
+}
+.squelette-image {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+}
+
+/* --- Micro-interactions --- */
+.carte-produit,
+.survol-souleve {
+  transition:
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.carte-produit:hover,
+.survol-souleve:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 18px 38px rgba(43, 35, 32, 0.13);
+}
+
+/* Zoom doux sur les images de carte */
+.carte-produit img,
+.zoom-doux img {
+  transition: transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.carte-produit:hover img,
+.zoom-doux:hover img {
+  transform: scale(1.055);
+}
+
+/* Boutons : retour tactile */
+.btn {
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.18s ease;
+}
+.btn:active {
+  transform: scale(0.97);
+}
+
+/* --- Respect de « animations réduites » --- */
+@media (prefers-reduced-motion: reduce) {
+  .app-apparition,
+  .app-apparition.est-visible,
+  .page-entree,
+  .squelette,
+  .carte-produit,
+  .carte-produit img,
+  .survol-souleve,
+  .zoom-doux img,
+  .btn {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+}
+/* Transition native entre les routes */
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root) {
+  animation: 0.28s cubic-bezier(0.4, 0, 1, 1) both fondu-sortie;
+}
+::view-transition-new(root) {
+  animation: 0.42s cubic-bezier(0.22, 1, 0.36, 1) both fondu-entree;
+}
+@keyframes fondu-sortie {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes fondu-entree {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}

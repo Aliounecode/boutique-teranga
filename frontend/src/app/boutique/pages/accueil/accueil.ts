@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
+import { Apparition } from '../../../coeur/directives/apparition';
 
 import { CatalogueService } from '../../../coeur/services/catalogue';
 import { FcfaPipe } from '../../../coeur/pipes/fcfa-pipe';

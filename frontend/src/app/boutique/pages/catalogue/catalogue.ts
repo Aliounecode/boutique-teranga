@@ -5,19 +5,27 @@ import { catchError, of, switchMap, tap } from 'rxjs';
 
 import { CatalogueService } from '../../../coeur/services/catalogue';
 import { CarteProduit } from '../../../coeur/composants/carte-produit/carte-produit';
+import { Apparition } from '../../../coeur/directives/apparition';
 import { CategorieArbre, FiltresProduits, PageProduits } from '../../../coeur/modeles/modeles';
 
-interface CategoriePlate { id: number; nom: string; niveau: number; }
+interface CategoriePlate {
+  id: number;
+  nom: string;
+  niveau: number;
+}
 
 @Component({
   selector: 'bq-catalogue',
-  imports: [CarteProduit],
+  imports: [CarteProduit, Apparition],
   templateUrl: './catalogue.html',
   styleUrl: './catalogue.scss',
 })
 export class Catalogue {
   private readonly catalogue = inject(CatalogueService);
   private readonly route = inject(ActivatedRoute);
+
+  /** Blocs fantomes affiches pendant le chargement. */
+  readonly squelettes = Array.from({ length: 8 });
 
   readonly categories = toSignal(this.catalogue.arbreCategories(), {
     initialValue: [] as CategorieArbre[],
@@ -33,7 +41,12 @@ export class Catalogue {
       switchMap((f) =>
         this.catalogue.listerProduits(f).pipe(
           catchError(() =>
-            of({ total: 0, page: f.page ?? 1, taille_page: f.taille_page ?? 12, elements: [] } as PageProduits),
+            of({
+              total: 0,
+              page: f.page ?? 1,
+              taille_page: f.taille_page ?? 12,
+              elements: [],
+            } as PageProduits),
           ),
         ),
       ),
@@ -60,15 +73,33 @@ export class Catalogue {
     this.filtres.set({ ...this.filtres(), ...partiel, page: 1 });
   }
 
-  definirCategorie(id: number | undefined): void { this.appliquer({ categorie_id: id }); }
-  definirTri(tri: string): void { this.appliquer({ tri: tri as FiltresProduits['tri'] }); }
-  definirRecherche(valeur: string): void { this.appliquer({ recherche: valeur || undefined }); }
-  definirPrixMin(valeur: string): void { this.appliquer({ prix_min: valeur ? Number(valeur) : undefined }); }
-  definirPrixMax(valeur: string): void { this.appliquer({ prix_max: valeur ? Number(valeur) : undefined }); }
-  basculerPromo(): void { this.appliquer({ en_promotion: this.filtres().en_promotion ? undefined : true }); }
-  basculerStock(): void { this.appliquer({ en_stock: this.filtres().en_stock ? undefined : true }); }
-  reinitialiser(): void { this.filtres.set({ tri: 'recent', page: 1, taille_page: 12 }); }
-  allerPage(n: number): void { this.filtres.set({ ...this.filtres(), page: n }); }
+  definirCategorie(id: number | undefined): void {
+    this.appliquer({ categorie_id: id });
+  }
+  definirTri(tri: string): void {
+    this.appliquer({ tri: tri as FiltresProduits['tri'] });
+  }
+  definirRecherche(valeur: string): void {
+    this.appliquer({ recherche: valeur || undefined });
+  }
+  definirPrixMin(valeur: string): void {
+    this.appliquer({ prix_min: valeur ? Number(valeur) : undefined });
+  }
+  definirPrixMax(valeur: string): void {
+    this.appliquer({ prix_max: valeur ? Number(valeur) : undefined });
+  }
+  basculerPromo(): void {
+    this.appliquer({ en_promotion: this.filtres().en_promotion ? undefined : true });
+  }
+  basculerStock(): void {
+    this.appliquer({ en_stock: this.filtres().en_stock ? undefined : true });
+  }
+  reinitialiser(): void {
+    this.filtres.set({ tri: 'recent', page: 1, taille_page: 12 });
+  }
+  allerPage(n: number): void {
+    this.filtres.set({ ...this.filtres(), page: n });
+  }
 
   private aplatir(arbre: CategorieArbre[], niveau = 0): CategoriePlate[] {
     const resultat: CategoriePlate[] = [];
