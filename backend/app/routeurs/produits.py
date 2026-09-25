@@ -28,7 +28,7 @@ from app.schemas.variante_produit import (
     VarianteLecture,
     VarianteMiseAJour,
 )
-from app.securite.dependances import exiger_gerant
+from app.securite.dependances import exiger_gerant , exiger_gerant_ou_vendeur
 from app.utils.pagination import calculer_bornes
 from app.utils.references import reference_produit, reference_variante
 
@@ -258,7 +258,7 @@ def lister(
 
 
 # --- Liste de gestion (gerant) -- declaree AVANT /{produit_id} ---------------
-@routeur.get("/gestion", response_model=ProduitPage, dependencies=[Depends(exiger_gerant)])
+@routeur.get("/gestion", response_model=ProduitPage, dependencies=[Depends(exiger_gerant_ou_vendeur)])
 def lister_gestion(
     session: Session_,
     recherche: str | None = None,
