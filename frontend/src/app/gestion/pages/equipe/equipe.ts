@@ -125,13 +125,11 @@ import { Role, Utilisateur } from '../../../coeur/modeles/modeles';
                   }
                 </td>
                 <td>
-                  <select
-                    class="role-select"
-                    [value]="u.role.id.toString()"
-                    (change)="changerRole(u, $event)"
-                  >
+                  <select class="role-select" (change)="changerRole(u, $event)">
                     @for (r of roles(); track r.id) {
-                      <option [value]="r.id.toString()">{{ libelleRole(r.nom) }}</option>
+                      <option [value]="r.id" [selected]="r.id === u.role.id">
+                        {{ libelleRole(r.nom) }}
+                      </option>
                     }
                   </select>
                 </td>
