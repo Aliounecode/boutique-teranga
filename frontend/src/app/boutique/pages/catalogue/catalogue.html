@@ -11,24 +11,15 @@
     </div>
 
     <div class="groupe">
-      <label>Catégories</label>
-      <ul class="liste-cat">
-        <li>
-          <button [class.actif]="!filtres().categorie_id" (click)="definirCategorie(undefined)">
-            Toutes
-          </button>
-        </li>
+      <label for="cat">Catégories</label>
+      <select id="cat" class="select-cat" (change)="choisirCategorie($any($event.target).value)">
+        <option value="" [selected]="!filtres().categorie_id">Toutes les catégories</option>
         @for (c of categoriesPlates(); track c.id) {
-          <li [style.padding-left.px]="c.niveau * 14">
-            <button
-              [class.actif]="filtres().categorie_id === c.id"
-              (click)="definirCategorie(c.id)"
-            >
-              {{ c.nom }}
-            </button>
-          </li>
+          <option [value]="c.id" [selected]="filtres().categorie_id === c.id">
+            {{ libelleCategorie(c) }}
+          </option>
         }
-      </ul>
+      </select>
     </div>
 
     <div class="groupe">

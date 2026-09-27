@@ -76,6 +76,14 @@ export class Catalogue {
   definirCategorie(id: number | undefined): void {
     this.appliquer({ categorie_id: id });
   }
+  choisirCategorie(valeur: string): void {
+    this.definirCategorie(valeur ? Number(valeur) : undefined);
+  }
+
+  libelleCategorie(c: CategoriePlate): string {
+    // Indentation visuelle des sous-categories dans la liste deroulante.
+    return c.niveau > 0 ? '\u00A0\u00A0— ' + c.nom : c.nom;
+  }
   definirTri(tri: string): void {
     this.appliquer({ tri: tri as FiltresProduits['tri'] });
   }

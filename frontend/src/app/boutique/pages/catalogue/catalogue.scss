@@ -200,6 +200,21 @@
     grid-template-columns: 1fr 1fr;
   }
 }
+.select-cat {
+  width: 100%;
+  font-family: var(--sans);
+  font-size: 0.92rem;
+  padding: 11px 12px;
+  border: 1px solid var(--bordure);
+  background: var(--fond);
+  color: var(--texte);
+  cursor: pointer;
+  transition: border-color var(--transi);
+}
+.select-cat:focus {
+  outline: none;
+  border-color: var(--accent);
+}
 @media (max-width: 520px) {
   .grille {
     grid-template-columns: 1fr 1fr;
