@@ -21,7 +21,7 @@ from app.schemas.commande import (
     CommandePage,
     CommandeResume,
 )
-from app.securite.dependances import exiger_gerant , client_courant_optionnel
+from app.securite.dependances import exiger_gerant , client_courant_optionnel ,exiger_gerant_ou_vendeur
 from app.services import service_commande
 from app.utils.pagination import calculer_bornes
 
@@ -29,6 +29,7 @@ routeur = APIRouter(prefix="/commandes", tags=["Commandes en ligne"])
 
 Session_ = Annotated[Session, Depends(obtenir_session)]
 Gerant_ = Annotated[Utilisateur, Depends(exiger_gerant)]
+Personnel_ = Annotated[Utilisateur, Depends(exiger_gerant_ou_vendeur)]
 
 
 def _resume_commande(commande: Commande) -> CommandeResume:
@@ -42,6 +43,7 @@ def _resume_commande(commande: Commande) -> CommandeResume:
         montant_total=commande.montant_total,
         statut=commande.statut,
         nombre_articles=sum(ligne.quantite for ligne in commande.lignes),
+        traite_par=commande.traite_par,
     )
 
 
@@ -63,8 +65,8 @@ def creer_commande(
         raise HTTPException(status_code=erreur.code, detail=str(erreur))
     return service_commande.charger_commande(session, commande_id)
 
-# --- Liste (gerant) ----------------------------------------------------------
-@routeur.get("", response_model=CommandePage, dependencies=[Depends(exiger_gerant)])
+# --- Liste (gerant et vendeur) ----------------------------------------------------------
+@routeur.get("", response_model=CommandePage, dependencies=[Depends(exiger_gerant_ou_vendeur)])
 def lister_commandes(
     session: Session_,
     statut: StatutCommande | None = None,
@@ -96,8 +98,8 @@ def lister_commandes(
     )
 
 
-# --- Détail (gerant) ---------------------------------------------------------
-@routeur.get("/{commande_id}", response_model=CommandeLecture, dependencies=[Depends(exiger_gerant)])
+# --- Détail (Gerant et vendeur) ---------------------------------------------------------
+@routeur.get("/{commande_id}", response_model=CommandeLecture, dependencies=[Depends(exiger_gerant_ou_vendeur)])
 def obtenir_commande(commande_id: int, session: Session_):
     try:
         return service_commande.charger_commande(session, commande_id)
@@ -117,13 +119,13 @@ def _appliquer_action(action, session: Session, commande_id: int, gerant: Utilis
 
 
 @routeur.post("/{commande_id}/accepter", response_model=CommandeLecture)
-def accepter_commande(commande_id: int, session: Session_, gerant: Gerant_):
-    return _appliquer_action(service_commande.accepter_commande, session, commande_id, gerant)
+def accepter_commande(commande_id: int, session: Session_, membre: Personnel_):
+    return _appliquer_action(service_commande.accepter_commande, session, commande_id, membre)
 
 
 @routeur.post("/{commande_id}/refuser", response_model=CommandeLecture)
-def refuser_commande(commande_id: int, session: Session_, gerant: Gerant_):
-    return _appliquer_action(service_commande.refuser_commande, session, commande_id, gerant)
+def refuser_commande(commande_id: int, session: Session_, membre: Personnel_):
+    return _appliquer_action(service_commande.refuser_commande, session, commande_id, membre)
 
 
 @routeur.post("/{commande_id}/annuler", response_model=CommandeLecture)

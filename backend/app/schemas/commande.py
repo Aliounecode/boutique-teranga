@@ -50,6 +50,7 @@ class CommandeLecture(BaseModel):
     statut: StatutCommande
     notes: str | None
     utilisateur_id: int | None
+    traite_par: str | None = None
     date_commande: datetime
     lignes: list[LigneCommandeLecture]
 
@@ -63,6 +64,7 @@ class CommandeResume(BaseModel):
     moyen_paiement: MoyenPaiement
     montant_total: Decimal
     statut: StatutCommande
+    traite_par: str | None = None
     nombre_articles: int
 
 

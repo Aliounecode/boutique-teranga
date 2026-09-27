@@ -167,6 +167,7 @@ export interface CommandeLecture {
   statut: StatutCommande;
   notes: string | null;
   utilisateur_id: number | null;
+  traite_par: string | null;
   date_commande: string;
   lignes: LigneCommandeLecture[];
 }
@@ -325,6 +326,7 @@ export interface CommandeResume {
   montant_total: string;
   statut: StatutCommande;
   nombre_articles: number;
+  traite_par: string | null;
 }
 
 export interface CommandePage {

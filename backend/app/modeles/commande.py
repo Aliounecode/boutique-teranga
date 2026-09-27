@@ -34,6 +34,13 @@ class Commande(Base):
 
     date_commande: Mapped[datetime] = mapped_column(server_default=func.now())
 
-    lignes: Mapped[list["LigneCommande"]] = relationship(
+    lignes: Mapped[list["LigneCommande"]] = relationship( # type: ignore
         back_populates="commande", cascade="all, delete-orphan"
     )
+    utilisateur: Mapped["Utilisateur | None"] = relationship(lazy="joined") # type: ignore
+
+    @property
+    def traite_par(self) -> str | None:
+        """Nom complet du membre (gerant ou vendeur) ayant traite la commande."""
+        u = self.utilisateur
+        return f"{u.prenom} {u.nom}" if u is not None else None

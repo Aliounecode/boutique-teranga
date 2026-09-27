@@ -49,13 +49,13 @@ export const routesGestion: Routes = [
       {
         path: 'commandes',
         component: CommandesListe,
-        canActivate: [gardeGerant],
+
         title: 'Commandes — Gestion',
       },
       {
         path: 'commandes/:id',
         component: CommandeDetail,
-        canActivate: [gardeGerant],
+
         title: 'Commande — Gestion',
       },
       { path: 'caisse', component: Caisse, title: 'Caisse — Gestion' },

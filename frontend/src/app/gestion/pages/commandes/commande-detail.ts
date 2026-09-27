@@ -2,7 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Observable } from 'rxjs';
-
+import { AuthService } from '../../../coeur/services/auth';
 import { CommandeService } from '../../../coeur/services/commande';
 import { FcfaPipe } from '../../../coeur/pipes/fcfa-pipe';
 import {
@@ -23,7 +23,8 @@ import {
 export class CommandeDetail {
   private readonly srv = inject(CommandeService);
   private readonly route = inject(ActivatedRoute);
-
+  private readonly auth = inject(AuthService);
+  readonly estGerant = this.auth.estGerant;
   readonly commande = signal<CommandeLecture | null | undefined>(undefined);
   readonly message = signal<string | null>(null);
   readonly erreur = signal<string | null>(null);
